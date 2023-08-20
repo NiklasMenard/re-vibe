@@ -1,0 +1,30 @@
+### List Posts
+GET http://localhost:8000/api/posts
+
+### Get Post by ID
+GET http://localhost:8000/api/post/1
+
+### Create Post
+POST http://localhost:8000/api/posts
+Content-Type: application/json
+
+{
+  "title": "New Post Title",
+  "content": "New Post Content",
+  "author_id": null,
+  "category_id": null
+}
+
+### Update Post
+PUT http://localhost:8000/api/posts/1
+Content-Type: application/json
+
+{
+  "title": "Updated Post Title",
+  "content": "Updated Post Content",
+  "author_id": 1,
+  "category_id": 1
+}
+
+### Delete Post
+DELETE http://localhost:8000/api/posts/1
