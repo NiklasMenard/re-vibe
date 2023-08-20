@@ -1,4 +1,8 @@
-# Rust Blog API Project README
+# Rust Blog API Project
+
+## Project Overview
+
+Welcome to the Rust Blog API project! This project serves as a platform for me to explore and learn the Rust programming language while building a foundational blog API. As I progress, I plan to transform this initial learning exercise into a more practical and feature-rich application. The project leverages Rust, the Diesel ORM, and PostgreSQL to provide a robust base that can be expanded upon in the future.ent.
 
 ## Table of Contents
 
@@ -12,10 +16,6 @@
 - [Contributing](#contributing)
 - [Future Improvements](#future-improvements)
 - [License](#license)
-
-## Project Overview
-
-Welcome to the Rust Blog API project! This project serves as a platform for me to explore and learn the Rust programming language while building a foundational blog API. As I progress, I plan to transform this initial learning exercise into a more practical and feature-rich application. The project leverages Rust, the Diesel ORM, and PostgreSQL to provide a robust base that can be expanded upon in the future.ent.
 
 ## Getting Started
 
