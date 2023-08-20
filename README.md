@@ -1,7 +1,5 @@
 # Rust Blog API Project README
 
-Welcome to the Rust Blog API project! This project is designed to help you learn the Rust programming language by building a blog API using a modular and organized project structure. The project uses Rust, the Diesel ORM, and PostgreSQL to provide a solid foundation for further development.
-
 ## Table of Contents
 
 - [Project Overview](#project-overview)
@@ -17,7 +15,7 @@ Welcome to the Rust Blog API project! This project is designed to help you learn
 
 ## Project Overview
 
-The Rust Blog API project offers an interactive learning experience for mastering Rust concepts while constructing a versatile blog API. The project utilizes Diesel ORM for efficient database interactions, PostgreSQL as the database system, and follows a modular structure to ensure maintainability and extensibility.
+Welcome to the Rust Blog API project! This project serves as a platform for me to explore and learn the Rust programming language while building a foundational blog API. As I progress, I plan to transform this initial learning exercise into a more practical and feature-rich application. The project leverages Rust, the Diesel ORM, and PostgreSQL to provide a robust base that can be expanded upon in the future.ent.
 
 ## Getting Started
 
