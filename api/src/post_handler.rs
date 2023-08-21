@@ -17,7 +17,7 @@ pub fn list_posts_handler() -> String {
     serde_json::to_string(&response).unwrap()
 }
 
-#[get("/post/<post_id>")]
+#[get("/posts/<post_id>")]
 pub fn list_post_handler(post_id: i32) -> Result<String, NotFound<String>> {
     let post = read::list_post(post_id)?;
 
