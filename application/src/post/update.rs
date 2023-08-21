@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 use domain::models::{NewPost, Post};
-use infrastructure::establish_connection;
+use infrastructure::database::establish_connection;
 use rocket::{response::status::NotFound, serde::json::Json};
 use shared::response_models::{Response, ResponseBody};
 
