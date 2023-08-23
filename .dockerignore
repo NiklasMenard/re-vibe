@@ -1,0 +1,40 @@
+# .dockerignore for Rust projects
+
+# Files and directories to ignore
+target/
+Cargo.lock
+.dockerignore
+**/*.rs.bk  # Backup Rust source files
+**/*.log
+**/*.tmp
+**/*.swp
+**/*.swo
+
+# IDE-specific files and directories
+.vscode/
+.idea/
+*.iml
+
+# Build and development artifacts
+target/
+*.bak
+*.swp
+*.swo
+*.log
+*.tmp
+*.pid
+*.pid.lock
+*.profraw
+*.gcda
+*.gcno
+*.dSYM/
+*.rmeta
+*.o
+
+# Exclude compiled binaries
+**/target/
+**/target-*/
+
+# Exclude documentation and examples
+**/doc/
+**/examples/
