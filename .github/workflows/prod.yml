@@ -1,9 +1,10 @@
-name: Build, Test and Deploy to Prod
+name: Build and Deploy to Prod
 
 on:
-  push:
-    branches:
-      - master
+  workflow_run:
+    workflows: ["Build and Deploy to Prod"]
+    types:
+      - manual
 
 jobs:
   build:
