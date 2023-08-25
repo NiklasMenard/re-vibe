@@ -1,10 +1,9 @@
 name: Build and Deploy to Prod
 
 on:
-  workflow_run:
-    workflows: ["Build and Deploy to Prod"]
-    types:
-      - manual
+  push:
+    branches:
+      - master
 
 jobs:
   build:
