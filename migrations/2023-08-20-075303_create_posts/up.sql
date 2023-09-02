@@ -1,7 +1,8 @@
--- Create the Authors table
-CREATE TABLE authors (
-    author_id SERIAL PRIMARY KEY,
+-- Create the Users table
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     bio TEXT,
     profile_picture_url TEXT
@@ -30,7 +31,7 @@ CREATE TABLE posts (
     title VARCHAR(200) NOT NULL,
     content TEXT NOT NULL,
     publication_date TIMESTAMP NOT NULL,
-    author_id INT NOT NULL,
+    author_id UUID NOT NULL,
     category_id INT NOT NULL
 );
 
@@ -49,19 +50,20 @@ CREATE TABLE tags (
 
 -- Create foreign key constraints
 ALTER TABLE comments ADD CONSTRAINT fk_comments_posts FOREIGN KEY (post_id) REFERENCES posts(post_id);
-ALTER TABLE posts ADD CONSTRAINT fk_posts_authors FOREIGN KEY (author_id) REFERENCES authors(author_id);
+ALTER TABLE posts ADD CONSTRAINT fk_posts_users FOREIGN KEY (author_id) REFERENCES users(id);
 ALTER TABLE posts ADD CONSTRAINT fk_posts_categories FOREIGN KEY (category_id) REFERENCES categories(category_id);
 ALTER TABLE posttags ADD CONSTRAINT fk_posttags_posts FOREIGN KEY (post_id) REFERENCES posts(post_id);
 ALTER TABLE posttags ADD CONSTRAINT fk_posttags_tags FOREIGN KEY (tag_id) REFERENCES tags(tag_id);
 
--- Seed Scientists
-INSERT INTO authors (name, email, bio, profile_picture_url)
+-- Seed Users
+INSERT INTO users (id, name, email, password, bio, profile_picture_url)
 VALUES
-    ('Albert Einstein', 'einstein@example.com', 'Theoretical physicist known for the theory of relativity', 'url1'),
-    ('Marie Curie', 'mariecurie@example.com', 'Physicist and chemist, pioneer in radioactivity research', 'url2'),
-    ('Charles Darwin', 'cdarwin@example.com', 'Naturalist, known for the theory of evolution', 'url3'),
-    ('Isaac Newton', 'newton@example.com', 'Mathematician and physicist, formulated the laws of motion and universal gravitation', 'url4'),
-    ('Jane Goodall', 'janegoodall@example.com', 'Primatologist and ethologist, studied chimpanzees in the wild', 'url5');
+    ('5fbb36b4-04f3-4a25-bd95-545f8de8b430', 'Albert Einstein', 'einstein@example.com', 'hashed_password_1', 'Theoretical physicist known for the theory of relativity', 'url1'),
+    ('b4b28e67-3b94-4e14-b126-d4d0c69d59e7', 'Marie Curie', 'mariecurie@example.com', 'hashed_password_2', 'Physicist and chemist, pioneer in radioactivity research', 'url2'),
+    ('1e7ce3ca-2c0b-4344-8b33-2a2e6cbe0b59', 'Charles Darwin', 'cdarwin@example.com', 'hashed_password_3', 'Naturalist, known for the theory of evolution', 'url3'),
+    ('e6ab1f4d-6653-4a97-82ab-3ad6ee8c7be5', 'Isaac Newton', 'newton@example.com', 'hashed_password_4', 'Mathematician and physicist, formulated the laws of motion and universal gravitation', 'url4'),
+    ('edc35096-bc18-4192-8b0e-e8fb6c2d4a3b', 'Jane Goodall', 'janegoodall@example.com', 'hashed_password_5', 'Primatologist and ethologist, studied chimpanzees in the wild', 'url5');
+
 
 -- Seed Scientific Categories
 INSERT INTO categories (name, description)
@@ -75,8 +77,8 @@ VALUES
 -- Seed Posts
 INSERT INTO posts (title, content, publication_date, author_id, category_id)
 VALUES
-    ('Theory of Relativity', 'Imagination is more important than knowledge.', NOW(), 1, 1),
-    ('Radioactivity Research', 'Nothing in life is to be feared, it is only to be understood.', NOW(), 2, 2),
-    ('Theory of Evolution', 'It is not the strongest of the species that survives, nor the most intelligent that survives. It is the one that is the most adaptable to change.', NOW(), 3, 3),
-    ('Laws of Motion', 'If I have seen further, it is by standing on the shoulders of giants.', NOW(), 4, 4),
-    ('Chimpanzee Research', 'The least I can do is speak out for those who cannot speak for themselves.', NOW(), 5, 5);
+    ('Theory of Relativity', 'Imagination is more important than knowledge.', NOW(), '5fbb36b4-04f3-4a25-bd95-545f8de8b430', 1),
+    ('Radioactivity Research', 'Nothing in life is to be feared, it is only to be understood.', NOW(), 'b4b28e67-3b94-4e14-b126-d4d0c69d59e7', 2),
+    ('Theory of Evolution', 'It is not the strongest of the species that survives, nor the most intelligent that survives. It is the one that is the most adaptable to change.', NOW(), '1e7ce3ca-2c0b-4344-8b33-2a2e6cbe0b59', 3),
+    ('Laws of Motion', 'If I have seen further, it is by standing on the shoulders of giants.', NOW(), 'e6ab1f4d-6653-4a97-82ab-3ad6ee8c7be5', 4),
+    ('Chimpanzee Research', 'The least I can do is speak out for those who cannot speak for themselves.', NOW(), 'edc35096-bc18-4192-8b0e-e8fb6c2d4a3b', 5);

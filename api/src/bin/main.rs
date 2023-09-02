@@ -8,7 +8,7 @@ use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 type DB = diesel::pg::Pg;
 
-use infrastructure::database::establish_connection;
+use infrastructure::database::connection::establish_connection;
 
 pub fn run_db_migrations(conn: &mut impl MigrationHarness<DB>) {
     conn.run_pending_migrations(MIGRATIONS)

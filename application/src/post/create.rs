@@ -1,7 +1,8 @@
 use chrono::Utc;
 use diesel::RunQueryDsl;
 use domain::models::{NewPost, Post};
-use infrastructure::database::establish_connection;
+
+use infrastructure::database::connection::establish_connection;
 use rocket::response::status::Created;
 use rocket::serde::json::Json;
 use shared::response_models::{Response, ResponseBody};

@@ -1,12 +1,10 @@
 use diesel::prelude::*;
-use domain::models::Post;
-use infrastructure::database::establish_connection;
+use domain::{models::Post, schema::posts};
+use infrastructure::database::connection::establish_connection;
 use rocket::response::status::NotFound;
 use shared::response_models::{Response, ResponseBody};
 
 pub fn list_post(post_id: i32) -> Result<Post, NotFound<String>> {
-    use domain::schema::posts;
-
     let connect = &mut establish_connection();
 
     match posts::table.find(post_id).first::<Post>(connect) {
@@ -29,8 +27,6 @@ pub fn list_post(post_id: i32) -> Result<Post, NotFound<String>> {
 }
 
 pub fn list_posts() -> Vec<Post> {
-    use domain::schema::posts;
-
     let connect = &mut establish_connection();
 
     match posts::table

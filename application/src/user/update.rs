@@ -1,28 +1,30 @@
 use diesel::prelude::*;
-use domain::models::{NewPost, Post};
+use domain::models::User;
 use infrastructure::database::connection::establish_connection;
-use rocket::{response::status::NotFound, serde::json::Json};
+use rocket::response::status::NotFound;
 use shared::response_models::{Response, ResponseBody};
 
-pub fn update_post(id: i32, new_post: Json<NewPost>) -> Result<Post, NotFound<String>> {
-    use domain::schema::posts::dsl::*;
+pub fn update(user: User) -> Result<User, NotFound<String>> {
+    use domain::schema::users::dsl::*;
 
-    let updated_post = new_post.into_inner();
-
-    match diesel::update(posts.find(id))
+    match diesel::update(users.find(&user.id))
         .set((
-            title.eq(updated_post.title),
-            content.eq(updated_post.content),
+            id.eq(&user.id),
+            name.eq(user.name),
+            password.eq(user.password),
+            email.eq(user.email),
+            bio.eq(user.bio),
+            profile_picture_url.eq(user.profile_picture_url),
         ))
-        .get_result::<Post>(&mut establish_connection())
+        .get_result::<User>(&mut establish_connection())
     {
         Ok(post) => Ok(post),
         Err(err) => match err {
             diesel::result::Error::NotFound => {
                 let response = Response {
                     body: ResponseBody::Message(format!(
-                        "Error updating post with id {:?} - {:?}",
-                        post_id, err
+                        "Error updating user with id {:?} - {:?}",
+                        id, err
                     )),
                 };
                 return Err(NotFound(serde_json::to_string(&response).unwrap()));
