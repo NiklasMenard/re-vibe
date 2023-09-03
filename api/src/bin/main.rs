@@ -1,7 +1,9 @@
 #[macro_use]
 extern crate rocket;
 
+use api::auth_handler;
 use api::post_handler;
+use api::user_handler;
 
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 
@@ -21,14 +23,25 @@ fn rocket() -> _ {
 
     run_db_migrations(connection);
 
-    rocket::build().mount(
-        "/api",
-        routes![
-            post_handler::list_posts_handler,
-            post_handler::list_post_handler,
-            post_handler::create_post_handler,
-            post_handler::update_post_handler,
-            post_handler::delete_post_handler,
-        ],
-    )
+    rocket::build()
+        .mount(
+            "/api",
+            routes![
+                post_handler::list_posts_handler,
+                post_handler::list_post_handler,
+                post_handler::create_post_handler,
+                post_handler::update_post_handler,
+                post_handler::delete_post_handler,
+            ],
+        )
+        .mount(
+            "/user",
+            routes![
+                user_handler::register,
+                user_handler::find_user_by_id,
+                user_handler::update_user,
+                user_handler::delete_user
+            ],
+        )
+        .mount("/auth", routes![auth_handler::login,])
 }
