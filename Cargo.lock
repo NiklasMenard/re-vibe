@@ -53,6 +53,7 @@ dependencies = [
  "infrastructure",
  "jwt",
  "rocket",
+ "serde",
  "serde_json",
  "sha2",
  "shared",
