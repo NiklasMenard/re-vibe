@@ -1,20 +1,23 @@
 use diesel::prelude::*;
 use domain::models::User;
 use infrastructure::database::connection::establish_connection;
-use rocket::response::status::NotFound;
+use rocket::{response::status::NotFound, serde::json::Json};
 use shared::response_models::{Response, ResponseBody};
+use uuid::Uuid;
 
-pub fn update(user: User) -> Result<User, NotFound<String>> {
+pub fn update_post(user_id: String, user: Json<User>) -> Result<User, NotFound<String>> {
     use domain::schema::users::dsl::*;
 
-    match diesel::update(users.find(&user.id))
+    let post_to_update = user.into_inner();
+
+    match diesel::update(users.find(Uuid::parse_str(&user_id).unwrap()))
         .set((
-            id.eq(&user.id),
-            name.eq(user.name),
-            password.eq(user.password),
-            email.eq(user.email),
-            bio.eq(user.bio),
-            profile_picture_url.eq(user.profile_picture_url),
+            id.eq(&post_to_update.id),
+            name.eq(post_to_update.name),
+            password.eq(post_to_update.password),
+            email.eq(post_to_update.email),
+            bio.eq(post_to_update.bio),
+            profile_picture_url.eq(post_to_update.profile_picture_url),
         ))
         .get_result::<User>(&mut establish_connection())
     {
