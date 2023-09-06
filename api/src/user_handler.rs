@@ -14,17 +14,8 @@ use uuid::Uuid;
 
 use application::user::{create, delete, read, update};
 
-#[get("/info")]
-pub fn info(key: ApiKey) -> Json<Value> {
-    Json(json!({
-        "success":true,
-        "message": key.0
-    }
-    ))
-}
-
 #[get("/<id>")]
-pub fn find_user_by_id(id: String) -> Result<String, NotFound<String>> {
+pub fn find_user_by_id(_key: ApiKey, id: String) -> Result<String, NotFound<String>> {
     let user = read::user_information(Uuid::parse_str(&id).unwrap())?;
 
     let response = Response {
@@ -35,7 +26,7 @@ pub fn find_user_by_id(id: String) -> Result<String, NotFound<String>> {
 }
 
 #[put("/<id>", data = "<user>")]
-pub fn update_user(id: String, user: Json<User>) -> Result<String, NotFound<String>> {
+pub fn update_user(_key: ApiKey, id: String, user: Json<User>) -> Result<String, NotFound<String>> {
     let user = update::update_post(id, user)?;
 
     let response = Response {
@@ -46,15 +37,10 @@ pub fn update_user(id: String, user: Json<User>) -> Result<String, NotFound<Stri
 }
 
 #[delete("/<id>")]
-pub fn delete_user(id: String) -> Json<Value> {
+pub fn delete_user(_key: ApiKey, id: String) -> Json<Value> {
     Json(json!({
         "success": delete::delete(Uuid::parse_str(&id).unwrap())
     }))
-}
-
-#[get("/sensitive")]
-pub fn sensitive(key: ApiKey) -> String {
-    format!("Hello, you have been identified as {}", key.0)
 }
 
 #[post("/register", format = "application/json", data = "<credentials>")]

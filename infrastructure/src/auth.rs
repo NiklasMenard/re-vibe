@@ -1,4 +1,6 @@
-use rocket::request::{self, FromRequest, Outcome, Request};
+use rocket::request::{self, FromRequest, Request};
+
+use rocket::http::Status;
 
 // use crypto::sha2::Sha256;
 use hmac::{Hmac, Mac};
@@ -30,15 +32,22 @@ pub fn read_token(incoming: &str) -> Result<String, String> {
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for ApiKey {
-    type Error = ();
-    async fn from_request(request: &'r Request<'_>) -> request::Outcome<ApiKey, ()> {
+    type Error = Option<String>;
+
+    async fn from_request(request: &'r Request<'_>) -> request::Outcome<ApiKey, Option<String>> {
         let keys: Vec<_> = request.headers().get("Authentication").collect();
-        if keys.len() != 1 {
-            return Outcome::Forward(());
-        }
-        match read_token(keys[0]) {
-            Ok(claim) => Outcome::Success(ApiKey(claim)),
-            Err(_) => Outcome::Forward(()),
-        }
+
+        match keys.len() {
+            0 => return request::Outcome::Failure((Status::Unauthorized, None)),
+            1 => {
+                return match read_token(keys[0]) {
+                    Ok(claim) => request::Outcome::Success(ApiKey(claim)),
+                    Err(error_message) => {
+                        request::Outcome::Failure((Status::BadRequest, Some(error_message)))
+                    }
+                }
+            }
+            _ => return request::Outcome::Failure((Status::BadRequest, None)),
+        };
     }
 }

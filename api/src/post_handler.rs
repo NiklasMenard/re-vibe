@@ -1,5 +1,6 @@
 use application::post::{create, delete, read, update};
 use domain::models::NewPost;
+use infrastructure::auth::ApiKey;
 use rocket::response::status::{Created, NotFound};
 
 use rocket::serde::json::Json;
@@ -7,7 +8,7 @@ use rocket::{delete, get, post, put};
 use shared::response_models::{Response, ResponseBody};
 
 #[get("/posts")]
-pub fn list_posts_handler() -> String {
+pub fn list_posts_handler(_key: ApiKey) -> String {
     let posts = read::list_posts();
 
     let response = Response {
@@ -18,7 +19,7 @@ pub fn list_posts_handler() -> String {
 }
 
 #[get("/posts/<post_id>")]
-pub fn list_post_handler(post_id: i32) -> Result<String, NotFound<String>> {
+pub fn list_post_handler(_key: ApiKey, post_id: i32) -> Result<String, NotFound<String>> {
     let post = read::list_post(post_id)?;
 
     let response = Response {
@@ -29,7 +30,11 @@ pub fn list_post_handler(post_id: i32) -> Result<String, NotFound<String>> {
 }
 
 #[put("/posts/<post_id>", format = "application/json", data = "<post>")]
-pub fn update_post_handler(post_id: i32, post: Json<NewPost>) -> Result<String, NotFound<String>> {
+pub fn update_post_handler(
+    _key: ApiKey,
+    post_id: i32,
+    post: Json<NewPost>,
+) -> Result<String, NotFound<String>> {
     let post = update::update_post(post_id, post)?;
 
     let response = Response {
@@ -40,12 +45,12 @@ pub fn update_post_handler(post_id: i32, post: Json<NewPost>) -> Result<String, 
 }
 
 #[post("/posts", format = "application/json", data = "<post>")]
-pub fn create_post_handler(post: Json<NewPost>) -> Created<String> {
+pub fn create_post_handler(_key: ApiKey, post: Json<NewPost>) -> Created<String> {
     create::create_post(post)
 }
 
 #[delete("/posts/<id>")]
-pub fn delete_post_handler(id: i32) -> Result<String, NotFound<String>> {
+pub fn delete_post_handler(_key: ApiKey, id: i32) -> Result<String, NotFound<String>> {
     let posts = delete::delete_post(id)?;
 
     let response = Response {
