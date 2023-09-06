@@ -1,4 +1,4 @@
-use argon2::Config;
+use bcrypt::{hash, DEFAULT_COST};
 use diesel::prelude::*;
 use domain::{
     models::{InsertableUser, User},
@@ -48,9 +48,9 @@ pub fn register_user_by_email_and_password(email: String, password_: String) -> 
     let connection = &mut establish_connection();
 
     let salt = b"somesalt";
-    let config = Config::default();
-    let hash = argon2::hash_encoded(&password_.as_bytes(), salt, &config).unwrap();
-    println!("Hashed password {:?}", &hash);
+
+    let hash = hash(format!("{:?}{}", salt, password_), DEFAULT_COST).unwrap();
+
     let res = users::table
         .filter(users::email.eq(email))
         .filter(users::password.eq(hash))

@@ -1,4 +1,4 @@
-use argon2::{self, Config};
+use bcrypt::{hash, DEFAULT_COST};
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
@@ -91,8 +91,9 @@ pub struct InsertableUser {
 impl InsertableUser {
     pub fn from_user(user: User) -> InsertableUser {
         let salt = b"somesalt";
-        let config = Config::default();
-        let hash = argon2::hash_encoded(&user.password.as_bytes(), salt, &config).unwrap();
+
+        let hash = hash(format!("{:?}{}", salt, user.password), DEFAULT_COST).unwrap();
+
         InsertableUser {
             id: user.id,
             name: user.name,
