@@ -1,7 +1,8 @@
 use domain::models::User;
 use infrastructure::auth::ApiKey;
 
-use rocket::response::status::{Created, NotFound};
+use rocket::http::Status;
+use rocket::response::status::NotFound;
 use rocket::serde::json::{json, Json};
 use rocket::{delete, get, post, put};
 
@@ -44,6 +45,6 @@ pub fn delete_user(_key: ApiKey, id: String) -> Json<Value> {
 }
 
 #[post("/register", format = "application/json", data = "<credentials>")]
-pub fn register(credentials: Json<Credentials>) -> Created<String> {
+pub fn register(credentials: Json<Credentials>) -> Status {
     create::register_user(credentials)
 }

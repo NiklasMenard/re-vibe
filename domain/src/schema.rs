@@ -53,12 +53,14 @@ diesel::table! {
     users (id) {
         id -> Uuid,
         #[max_length = 100]
-        name -> Varchar,
-        #[max_length = 100]
         password -> Varchar,
         #[max_length = 100]
         email -> Varchar,
+        #[max_length = 100]
+        salt -> Varchar,
         bio -> Nullable<Text>,
+        #[max_length = 100]
+        name -> Nullable<Varchar>,
         profile_picture_url -> Nullable<Text>,
     }
 }
@@ -69,4 +71,11 @@ diesel::joinable!(posts -> users (author_id));
 diesel::joinable!(posttags -> posts (post_id));
 diesel::joinable!(posttags -> tags (tag_id));
 
-diesel::allow_tables_to_appear_in_same_query!(categories, comments, posts, posttags, tags, users,);
+diesel::allow_tables_to_appear_in_same_query!(
+    categories,
+    comments,
+    posts,
+    posttags,
+    tags,
+    users,
+);

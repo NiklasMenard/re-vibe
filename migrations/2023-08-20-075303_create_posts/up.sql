@@ -1,10 +1,11 @@
 -- Create the Users table
 CREATE TABLE users (
     id UUID PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
     password VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    salt VARCHAR(100) NOT NULL,
     bio TEXT,
+    name VARCHAR(100),
     profile_picture_url TEXT
 );
 
@@ -56,13 +57,13 @@ ALTER TABLE posttags ADD CONSTRAINT fk_posttags_posts FOREIGN KEY (post_id) REFE
 ALTER TABLE posttags ADD CONSTRAINT fk_posttags_tags FOREIGN KEY (tag_id) REFERENCES tags(tag_id);
 
 -- Seed Users
-INSERT INTO users (id, name, email, password, bio, profile_picture_url)
+INSERT INTO users (id, name, email, password, salt, bio, profile_picture_url)
 VALUES
-    ('5fbb36b4-04f3-4a25-bd95-545f8de8b430', 'Albert Einstein', 'einstein@example.com', 'hashed_password_1', 'Theoretical physicist known for the theory of relativity', 'url1'),
-    ('b4b28e67-3b94-4e14-b126-d4d0c69d59e7', 'Marie Curie', 'mariecurie@example.com', 'hashed_password_2', 'Physicist and chemist, pioneer in radioactivity research', 'url2'),
-    ('1e7ce3ca-2c0b-4344-8b33-2a2e6cbe0b59', 'Charles Darwin', 'cdarwin@example.com', 'hashed_password_3', 'Naturalist, known for the theory of evolution', 'url3'),
-    ('e6ab1f4d-6653-4a97-82ab-3ad6ee8c7be5', 'Isaac Newton', 'newton@example.com', 'hashed_password_4', 'Mathematician and physicist, formulated the laws of motion and universal gravitation', 'url4'),
-    ('edc35096-bc18-4192-8b0e-e8fb6c2d4a3b', 'Jane Goodall', 'janegoodall@example.com', 'hashed_password_5', 'Primatologist and ethologist, studied chimpanzees in the wild', 'url5');
+    ('5fbb36b4-04f3-4a25-bd95-545f8de8b430', 'Albert Einstein', 'einstein@example.com', 'hashed_password_1', 'salt_hash', 'Theoretical physicist known for the theory of relativity', 'url1'),
+    ('b4b28e67-3b94-4e14-b126-d4d0c69d59e7', 'Marie Curie', 'mariecurie@example.com', 'hashed_password_2', 'salt_hash', 'Physicist and chemist, pioneer in radioactivity research', 'url2'),
+    ('1e7ce3ca-2c0b-4344-8b33-2a2e6cbe0b59', 'Charles Darwin', 'cdarwin@example.com', 'hashed_password_3', 'salt_hash', 'Naturalist, known for the theory of evolution', 'url3'),
+    ('e6ab1f4d-6653-4a97-82ab-3ad6ee8c7be5', 'Isaac Newton', 'newton@example.com', 'hashed_password_4', 'salt_hash', 'Mathematician and physicist, formulated the laws of motion and universal gravitation', 'url4'),
+    ('edc35096-bc18-4192-8b0e-e8fb6c2d4a3b', 'Jane Goodall', 'janegoodall@example.com', 'hashed_password_5', 'salt_hash', 'Primatologist and ethologist, studied chimpanzees in the wild', 'url5');
 
 
 -- Seed Scientific Categories
