@@ -6,7 +6,7 @@ use rocket::response::status::NotFound;
 use shared::response_models::{Response, ResponseBody};
 use uuid::Uuid;
 
-pub fn user_information(id: Uuid) -> Result<User, NotFound<String>> {
+pub fn get_by_id(id: Uuid) -> Result<User, NotFound<String>> {
     let connection = &mut establish_connection();
 
     match users::table.find(id).first::<User>(connection) {

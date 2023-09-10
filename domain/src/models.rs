@@ -18,6 +18,21 @@ pub struct User {
     pub name: Option<String>,
     pub profile_picture_url: Option<String>,
 }
+
+impl User {
+    pub fn hash_with_salt(password: String, salt: String) -> String {
+        let decoded_bytes = base64::decode(&salt).unwrap();
+        let mut salt_array: [u8; 16] = [0; 16];
+        salt_array.copy_from_slice(&decoded_bytes);
+
+        let hash = hash_with_salt(password, DEFAULT_COST, salt_array)
+            .unwrap()
+            .to_string();
+
+        hash
+    }
+}
+
 // Struct for the Categories table
 #[derive(Queryable, Serialize, Deserialize, Debug)]
 pub struct Category {
@@ -89,29 +104,24 @@ pub struct InsertableUser {
     salt: String,
 }
 
-pub struct RegisterableUser {
-    pub password: String,
-    pub email: String,
-}
-
 impl InsertableUser {
-    fn generate_salt() -> [u8; 16] {
+    fn generate_random_salt() -> [u8; 16] {
         let mut rng = rand::thread_rng();
         let mut bytes = [0u8; 16];
         rng.fill(&mut bytes);
         bytes
     }
 
-    pub fn from_user(new_user: RegisterableUser) -> InsertableUser {
-        let new_salt = InsertableUser::generate_salt();
+    pub fn from_credentials(email: &str, password: &str) -> InsertableUser {
+        let new_salt = InsertableUser::generate_random_salt();
 
-        let hash = hash_with_salt(new_user.password, DEFAULT_COST, new_salt)
+        let hash = hash_with_salt(password, DEFAULT_COST, new_salt)
             .unwrap()
             .to_string();
 
         InsertableUser {
             id: Uuid::new_v4(),
-            email: new_user.email,
+            email: email.to_string(),
             password: hash,
             salt: base64::encode(&new_salt),
         }
