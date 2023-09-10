@@ -1,2 +1,8 @@
 [workspace]
-members = ["api", "domain", "infrastructure", "application", "shared"]
+members = [
+    "src/api",
+    "src/domain",
+    "src/infrastructure",
+    "src/application",
+    "src/shared",
+]
