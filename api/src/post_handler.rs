@@ -8,7 +8,7 @@ use rocket::{delete, get, post, put};
 use shared::response_models::{Response, ResponseBody};
 
 #[get("/posts")]
-pub fn list_posts_handler(_key: ApiKey) -> String {
+pub fn list_posts_handler(__key: ApiKey) -> String {
     let posts = read::list_posts();
 
     let response = Response {

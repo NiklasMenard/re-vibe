@@ -37,11 +37,11 @@ fn rocket() -> _ {
         .mount(
             "/user",
             routes![
-                user_handler::register,
-                user_handler::find_user_by_id,
-                user_handler::update_user,
-                user_handler::delete_user
+                user_handler::register_user_handler,
+                user_handler::list_user_handler,
+                user_handler::update_user_handler,
+                user_handler::delete_user_handler
             ],
         )
-        .mount("/auth", routes![auth_handler::login,])
+        .mount("/auth", routes![auth_handler::login_handler,])
 }

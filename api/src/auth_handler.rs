@@ -8,17 +8,17 @@ use jwt::{AlgorithmType, Header, SignWithKey, Token};
 // use crypto::sha2::Sha256;
 use sha2::Sha384;
 
-use application::user::create;
+use application::user::login;
 use shared::request_models::Credentials;
 use std::collections::BTreeMap;
 
 #[post("/login", data = "<credentials>")]
-pub fn login(credentials: Json<Credentials>) -> Result<Json<Value>, Status> {
+pub fn login_handler(credentials: Json<Credentials>) -> Result<Json<Value>, Status> {
     let email = credentials.email.to_string();
     let password = credentials.password.to_string();
 
-    match create::register_user_by_email_and_password(email, password) {
-        None => Err(Status::NotFound),
+    match login::check_email_password(email, password) {
+        None => Err(Status::Unauthorized),
         Some(user) => {
             let key: Hmac<Sha384> = Hmac::new_from_slice(b"some-secret").unwrap();
             let header = Header {
