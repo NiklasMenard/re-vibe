@@ -5,7 +5,7 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::schema::{comments, posts, users};
+use crate::schema::{comments, posts, user_roles, users};
 
 // Struct for the Users table
 #[derive(Queryable, Serialize, Deserialize, Debug)]
@@ -20,7 +20,7 @@ pub struct User {
 }
 
 impl User {
-    pub fn hash_with_salt(password: String, salt: String) -> String {
+    pub fn hash_with_salt(password: &str, salt: &str) -> String {
         let decoded_bytes = base64::decode(&salt).unwrap();
         let mut salt_array: [u8; 16] = [0; 16];
         salt_array.copy_from_slice(&decoded_bytes);
@@ -31,6 +31,18 @@ impl User {
 
         hash
     }
+}
+
+#[derive(Queryable, Debug)]
+pub struct Role {
+    pub role_id: i32,
+    pub name: String,
+}
+
+#[derive(Queryable)]
+pub struct UserRole {
+    pub id: Uuid,
+    pub role: String,
 }
 
 // Struct for the Categories table
@@ -97,14 +109,14 @@ pub struct NewComment {
 
 #[derive(Insertable)]
 #[diesel(table_name = users)]
-pub struct InsertableUser {
+pub struct NewUser {
     id: Uuid,
     password: String,
     email: String,
     salt: String,
 }
 
-impl InsertableUser {
+impl NewUser {
     fn generate_random_salt() -> [u8; 16] {
         let mut rng = rand::thread_rng();
         let mut bytes = [0u8; 16];
@@ -112,18 +124,25 @@ impl InsertableUser {
         bytes
     }
 
-    pub fn from_credentials(email: &str, password: &str) -> InsertableUser {
-        let new_salt = InsertableUser::generate_random_salt();
+    pub fn from_credentials(email: &str, password: &str) -> NewUser {
+        let new_salt = NewUser::generate_random_salt();
 
         let hash = hash_with_salt(password, DEFAULT_COST, new_salt)
             .unwrap()
             .to_string();
 
-        InsertableUser {
+        NewUser {
             id: Uuid::new_v4(),
             email: email.to_string(),
             password: hash,
             salt: base64::encode(&new_salt),
         }
     }
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = user_roles)]
+pub struct NewUserRole {
+    pub user_id: Uuid,
+    pub role_id: i32,
 }

@@ -46,6 +46,7 @@ name = "api"
 version = "0.1.0"
 dependencies = [
  "application",
+ "chrono",
  "diesel",
  "diesel_migrations",
  "domain",
@@ -745,6 +746,7 @@ dependencies = [
 name = "infrastructure"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "diesel",
  "dotenvy",
  "hmac",
