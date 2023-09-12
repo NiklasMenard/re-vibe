@@ -37,19 +37,23 @@ POST http://localhost:8000/api/posts
 Content-Type: application/json
 Authentication: {{auth_token}}
 
-{
+{   
+    "author_id": "author_id",
     "title": "New Post",
-    "body": "This is the content of the new post"
+    "content": "This is the content of the new post",
+    "category_id":1
 }
 
 ### Update a specific post by ID (replace :id with an actual ID)
-PUT http://localhost:8000/api/posts/:id
+PUT http://localhost:8000/api/posts/1
 Content-Type: application/json
 Authentication: {{auth_token}}
 
-{
-    "title": "Updated Post Title",
-    "body": "Updated post content"
+{   
+    "author_id": "author_id",
+    "title": "New Post",
+    "content": "This is the content of the new post",
+    "category_id":1
 }
 
 ### Delete a specific post by ID (replace :id with an actual ID)
@@ -57,7 +61,6 @@ DELETE http://localhost:8000/api/posts/:id
 Authentication: {{auth_token}}
 
 ### Users Routes
-
 
 ### List user info
 GET http://localhost:8000/user/:id
