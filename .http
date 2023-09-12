@@ -1,0 +1,74 @@
+### Constants
+@auth_token = COPY PASTE AUTH TOKEN HERE AFTER LOGIN
+
+### Register a new user
+POST http://localhost:8000/user/register
+Content-Type: application/json
+Authentication: {{auth_token}}
+
+{
+    "email": "EMAIL",
+    "password": "PASSWORD"
+}
+
+### Authentication Routes
+
+# Login with a user (provide valid credentials)
+POST http://localhost:8000/auth/login
+Content-Type: application/json
+
+{
+    "email": "WRITE EMAIL HERE",
+    "password": "WRITE PASSWORD HERE"
+}
+
+### Posts Routes
+
+# List all posts
+GET http://localhost:8000/api/posts
+Authentication: {{auth_token}}
+
+### Get a specific post by ID (replace :id with an actual ID)
+GET http://localhost:8000/api/posts/1
+Authentication: {{auth_token}}
+
+### Create a new post
+POST http://localhost:8000/api/posts
+Content-Type: application/json
+Authentication: {{auth_token}}
+
+{
+    "title": "New Post",
+    "body": "This is the content of the new post"
+}
+
+### Update a specific post by ID (replace :id with an actual ID)
+PUT http://localhost:8000/api/posts/:id
+Content-Type: application/json
+Authentication: {{auth_token}}
+
+{
+    "title": "Updated Post Title",
+    "body": "Updated post content"
+}
+
+### Delete a specific post by ID (replace :id with an actual ID)
+DELETE http://localhost:8000/api/posts/:id
+Authentication: {{auth_token}}
+
+### Users Routes
+
+
+### List user info
+GET http://localhost:8000/user/:id
+Authentication: {{auth_token}}
+
+### Update a specific user by ID (replace :id with an actual ID)
+PUT http://localhost:8000/user/:id
+Content-Type: application/json
+Authentication: {{auth_token}}
+
+
+###  Delete a specific user by ID (replace :id with an actual ID)
+DELETE http://localhost:8000/user/:id
+Authentication: {{auth_token}}
