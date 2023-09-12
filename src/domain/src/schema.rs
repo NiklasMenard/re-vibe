@@ -42,10 +42,25 @@ diesel::table! {
 }
 
 diesel::table! {
+    roles (role_id) {
+        role_id -> Int4,
+        #[max_length = 50]
+        name -> Varchar,
+    }
+}
+
+diesel::table! {
     tags (tag_id) {
         tag_id -> Int4,
         #[max_length = 50]
         name -> Nullable<Varchar>,
+    }
+}
+
+diesel::table! {
+    user_roles (user_id, role_id) {
+        user_id -> Uuid,
+        role_id -> Int4,
     }
 }
 
@@ -70,12 +85,16 @@ diesel::joinable!(posts -> categories (category_id));
 diesel::joinable!(posts -> users (author_id));
 diesel::joinable!(posttags -> posts (post_id));
 diesel::joinable!(posttags -> tags (tag_id));
+diesel::joinable!(user_roles -> roles (role_id));
+diesel::joinable!(user_roles -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     categories,
     comments,
     posts,
     posttags,
+    roles,
     tags,
+    user_roles,
     users,
 );
