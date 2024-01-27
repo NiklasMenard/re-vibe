@@ -23,8 +23,6 @@ pub fn check_email_password(email: String, password: String) -> Option<UserRole>
             let hash = User::hash_with_salt(&password, &user.salt);
 
             if user.password == hash {
-                println!("{:?}, {:?}", user, role);
-
                 let new_user_role = UserRole {
                     id: user.id,
                     role: role.name,

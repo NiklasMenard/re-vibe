@@ -51,7 +51,7 @@ impl ApiKey {
 }
 
 fn timestamp_expired(timestamp: i64) -> bool {
-    let seconds = 300;
+    let seconds = 600;
 
     match Utc.timestamp_opt(timestamp, 0) {
         chrono::LocalResult::Single(timestamp_datetime) => {
@@ -64,7 +64,7 @@ fn timestamp_expired(timestamp: i64) -> bool {
 }
 
 pub fn read_token(incoming: &str) -> Result<ApiKey, TokenReadError> {
-    let token_str = Token::parse_unverified(incoming)
+    let token_str = Token::parse_unverified(&incoming[7..])
         .map_err(|_| TokenReadError::ParsingFailure("Unable to parse key".to_string()))?;
 
     let jwt_secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set.");
@@ -102,7 +102,7 @@ impl<'r> FromRequest<'r> for ApiKey {
     type Error = NetworkResponse;
 
     async fn from_request(request: &'r Request<'_>) -> request::Outcome<ApiKey, NetworkResponse> {
-        let keys: Vec<_> = request.headers().get("Authentication").collect();
+        let keys: Vec<_> = request.headers().get("Authorization").collect();
 
         match keys.len() {
             0 => {

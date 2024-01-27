@@ -35,9 +35,8 @@ pub fn register_user(credentials: Json<Credentials>) -> Status {
         Err(err) => match err {
             diesel::result::Error::DatabaseError(
                 diesel::result::DatabaseErrorKind::UniqueViolation,
-                info,
+                _info,
             ) => {
-                print!("{}", info.message());
                 return Status::Conflict;
             }
             _ => {
