@@ -36,8 +36,8 @@ pub fn login_handler(credentials: Json<Credentials>) -> Result<Json<Value>, Stat
                 .timestamp();
 
             let mut claims = BTreeMap::new();
-            claims.insert("sub", Some(user.id.to_string()));
-            claims.insert("role", Some(user.role.to_string()));
+            claims.insert("sub", Some(user.user_id.to_string()));
+            claims.insert("role", Some(user.role_id.to_string()));
             claims.insert("exp", Some(expiration.to_string()));
 
             let token = Token::new(header, claims);

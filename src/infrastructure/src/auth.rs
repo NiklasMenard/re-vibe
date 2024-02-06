@@ -42,11 +42,11 @@ pub enum TokenReadError {
 
 impl ApiKey {
     pub fn verify_user_role(role: &str) -> bool {
-        return role == "user" || role == "admin";
+        return role == "0" || role == "1";
     }
 
     pub fn verify_admin_role(role: &str) -> bool {
-        return role == "admin";
+        return role == "0";
     }
 }
 
