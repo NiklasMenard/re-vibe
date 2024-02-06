@@ -50,7 +50,7 @@ Before you begin, ensure that the following prerequisites are installed on your 
 4. Create a `.env` file in the project root directory and configure the database connection settings. You can use the following template:
 
    ```env
-   DATABASE_URL=postgres://username:password@localhost/blog_db
+   DATABASE_URL=postgres://username:password@localhost/stitch
    ```
 
    Replace `username` and `password` with your PostgreSQL credentials.
