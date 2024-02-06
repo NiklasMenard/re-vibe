@@ -6,7 +6,7 @@ use rocket::{Request, Response};
 
 use api::auth_handler;
 use api::catcher_handler;
-use api::post_handler;
+use api::product_handler;
 use api::user_handler;
 
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
@@ -61,11 +61,11 @@ fn rocket() -> _ {
         .mount(
             "/api",
             routes![
-                post_handler::list_posts_handler,
-                post_handler::list_post_handler,
-                post_handler::create_post_handler,
-                post_handler::update_post_handler,
-                post_handler::delete_post_handler,
+                product_handler::list_products_handler,
+                product_handler::list_product_handler,
+                product_handler::create_product_handler,
+                product_handler::update_product_handler,
+                product_handler::delete_product_handler,
             ],
         )
         .mount(

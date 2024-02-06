@@ -24,8 +24,8 @@ pub fn check_email_password(email: String, password: String) -> Option<UserRole>
 
             if user.password == hash {
                 let new_user_role = UserRole {
-                    id: user.id,
-                    role: role.name,
+                    user_id: user.id,
+                    role_id: role.role_id,
                 };
 
                 return Some(new_user_role);

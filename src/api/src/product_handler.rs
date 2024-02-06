@@ -1,5 +1,5 @@
-use application::post::{create, delete, read, update};
-use domain::models::NewPost;
+use application::product::{create, delete, read, update};
+use domain::models::NewProduct;
 use infrastructure::auth::ApiKey;
 
 use rocket::http::Status;
@@ -9,14 +9,14 @@ use rocket::serde::json::Json;
 use rocket::{delete, get, post, put};
 use shared::response_models::{Response, ResponseBody};
 
-#[get("/posts")]
-pub fn list_posts_handler(key: ApiKey) -> Result<String, Status> {
+#[get("/products")]
+pub fn list_products_handler(key: ApiKey) -> Result<String, Status> {
     match ApiKey::verify_user_role(&key.role) {
         true => {
-            let posts = read::list_posts();
+            let products = read::list_products();
 
             let response = Response {
-                body: ResponseBody::Posts(posts),
+                body: ResponseBody::Products(products),
             };
 
             Ok(serde_json::to_string(&response).unwrap())
@@ -25,14 +25,14 @@ pub fn list_posts_handler(key: ApiKey) -> Result<String, Status> {
     }
 }
 
-#[get("/posts/<post_id>")]
-pub fn list_post_handler(key: ApiKey, post_id: i32) -> Result<String, Status> {
+#[get("/products/<product_id>")]
+pub fn list_product_handler(key: ApiKey, product_id: i32) -> Result<String, Status> {
     match ApiKey::verify_user_role(&key.role) {
         true => {
-            let found_post = read::list_post(post_id).unwrap();
+            let found_product = read::list_product(product_id).unwrap();
 
             let response = Response {
-                body: ResponseBody::Post(found_post),
+                body: ResponseBody::Product(found_product),
             };
 
             Ok(serde_json::to_string(&response).unwrap())
@@ -41,18 +41,22 @@ pub fn list_post_handler(key: ApiKey, post_id: i32) -> Result<String, Status> {
     }
 }
 
-#[put("/posts/<post_id>", format = "application/json", data = "<post>")]
-pub fn update_post_handler(
+#[put(
+    "/products/<product_id>",
+    format = "application/json",
+    data = "<product>"
+)]
+pub fn update_product_handler(
     key: ApiKey,
-    post_id: i32,
-    post: Json<NewPost>,
+    product_id: i32,
+    product: Json<NewProduct>,
 ) -> Result<String, Status> {
     match ApiKey::verify_user_role(&key.role) {
         true => {
-            let post = update::update_post(post_id, post).unwrap();
+            let product = update::update_product(product_id, product).unwrap();
 
             let response = Response {
-                body: ResponseBody::Post(post),
+                body: ResponseBody::Product(product),
             };
 
             Ok(serde_json::to_string(&response).unwrap())
@@ -61,22 +65,25 @@ pub fn update_post_handler(
     }
 }
 
-#[post("/posts", format = "application/json", data = "<post>")]
-pub fn create_post_handler(key: ApiKey, post: Json<NewPost>) -> Result<Created<String>, Status> {
+#[post("/products", format = "application/json", data = "<product>")]
+pub fn create_product_handler(
+    key: ApiKey,
+    product: Json<NewProduct>,
+) -> Result<Created<String>, Status> {
     match ApiKey::verify_user_role(&key.role) {
-        true => Ok(create::create_post(post)),
+        true => Ok(create::post_product(product)),
         _ => return Err(Status::Unauthorized),
     }
 }
 
-#[delete("/posts/<id>")]
-pub fn delete_post_handler(key: ApiKey, id: i32) -> Result<String, Status> {
+#[delete("/products/<id>")]
+pub fn delete_product_handler(key: ApiKey, id: i32) -> Result<String, Status> {
     match ApiKey::verify_user_role(&key.role) {
         true => {
-            let posts = delete::delete_post(id).unwrap();
+            let products = delete::delete_product(id).unwrap();
 
             let response = Response {
-                body: ResponseBody::Posts(posts),
+                body: ResponseBody::Products(products),
             };
 
             Ok(serde_json::to_string(&response).unwrap())

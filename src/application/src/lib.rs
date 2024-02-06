@@ -1,4 +1,4 @@
 // application/src/lib.rs
 
-pub mod post;
+pub mod product;
 pub mod user;

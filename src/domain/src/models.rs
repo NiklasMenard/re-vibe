@@ -1,11 +1,13 @@
 use bcrypt::{hash_with_salt, DEFAULT_COST};
+
+use bigdecimal::BigDecimal;
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::schema::{comments, posts, user_roles, users};
+use crate::schema::{products, user_roles, users};
 
 // Struct for the Users table
 #[derive(Queryable, Serialize, Deserialize, Debug)]
@@ -31,80 +33,6 @@ impl User {
 
         hash
     }
-}
-
-#[derive(Queryable, Debug)]
-pub struct Role {
-    pub role_id: i32,
-    pub name: String,
-}
-
-#[derive(Queryable)]
-pub struct UserRole {
-    pub id: Uuid,
-    pub role: String,
-}
-
-// Struct for the Categories table
-#[derive(Queryable, Serialize, Deserialize, Debug)]
-pub struct Category {
-    pub category_id: i32,
-    pub name: String,
-    pub description: Option<String>,
-}
-
-// Struct for the Comments table
-#[derive(Queryable, Serialize, Deserialize, Debug)]
-pub struct Comment {
-    pub comment_id: i32,
-    pub post_id: Option<i32>,
-    pub author_name: String,
-    pub email: String,
-    pub content: String,
-    pub comment_date: Option<NaiveDateTime>,
-}
-
-// Struct for the Posts table
-#[derive(Queryable, Serialize, Ord, Eq, PartialEq, PartialOrd)]
-pub struct Post {
-    pub post_id: i32,
-    pub title: String,
-    pub content: String,
-    pub publication_date: NaiveDateTime,
-    pub author_id: Uuid,
-    pub category_id: i32,
-}
-
-// Struct for the PostTags table (Associative table)
-#[derive(Queryable, Serialize, Deserialize, Debug)]
-pub struct PostTag {
-    pub post_id: i32,
-    pub tag_id: i32,
-}
-
-// Struct for the Tags table
-#[derive(Queryable, Serialize, Deserialize, Debug)]
-pub struct Tag {
-    pub tag_id: i32,
-    pub name: Option<String>,
-}
-
-#[derive(Insertable, Deserialize)]
-#[serde(crate = "rocket::serde")]
-#[diesel(table_name = posts)]
-pub struct NewPost {
-    pub title: String,
-    pub content: String,
-    pub publication_date: Option<NaiveDateTime>,
-    pub author_id: Uuid,
-    pub category_id: i32,
-}
-
-#[derive(Insertable, Deserialize)]
-#[serde(crate = "rocket::serde")]
-#[diesel(table_name = comments)]
-pub struct NewComment {
-    pub content: String,
 }
 
 #[derive(Insertable)]
@@ -145,4 +73,63 @@ impl NewUser {
 pub struct NewUserRole {
     pub user_id: Uuid,
     pub role_id: i32,
+}
+
+#[derive(Queryable, Debug)]
+pub struct Role {
+    pub role_id: i32,
+    pub name: String,
+}
+
+#[derive(Queryable)]
+pub struct UserRole {
+    pub user_id: Uuid,
+    pub role_id: i32,
+}
+
+// Struct for the Categories table
+#[derive(Queryable, Serialize, Deserialize, Debug)]
+pub struct Category {
+    pub category_id: i32,
+    pub name: String,
+    pub description: Option<String>,
+}
+
+// Struct for the Products table
+#[derive(Queryable, Serialize, Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Product {
+    pub product_id: i32,
+    pub name: String,
+    pub description: String,
+    pub price: BigDecimal,
+    pub quantity: i32,
+    pub seller_id: Uuid,
+    pub category_id: i32,
+    pub creation_date: NaiveDateTime,
+}
+
+#[derive(Insertable, Deserialize)]
+#[serde(crate = "rocket::serde")]
+#[diesel(table_name = products)]
+pub struct NewProduct {
+    pub name: String,
+    pub description: String,
+    pub price: BigDecimal,
+    pub quantity: i32,
+    pub seller_id: Uuid,
+    pub category_id: i32,
+    pub creation_date: NaiveDateTime,
+}
+
+// Struct for the Tags table
+#[derive(Queryable, Serialize, Deserialize, Debug)]
+pub struct Tag {
+    pub tag_id: i32,
+    pub name: Option<String>,
+}
+
+#[derive(Queryable)]
+pub struct ProductTag {
+    pub product_id: i32,
+    pub tag_id: i32,
 }
