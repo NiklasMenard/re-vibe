@@ -19,9 +19,10 @@ diesel::table! {
 diesel::table! {
     products (product_id) {
         product_id -> Int4,
-        #[max_length = 200]
+        #[max_length = 50]
         name -> Varchar,
-        description -> Text,
+        #[max_length = 255]
+        description -> Varchar,
         price -> Numeric,
         quantity -> Int4,
         seller_id -> Uuid,

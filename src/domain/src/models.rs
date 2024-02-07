@@ -118,7 +118,6 @@ pub struct NewProduct {
     pub quantity: i32,
     pub seller_id: Uuid,
     pub category_id: i32,
-    pub creation_date: NaiveDateTime,
 }
 
 // Struct for the Tags table

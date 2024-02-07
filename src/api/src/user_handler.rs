@@ -1,5 +1,5 @@
 use domain::models::User;
-use infrastructure::auth::ApiKey;
+use infrastructure::auth::AdminApiKey;
 
 use rocket::http::Status;
 
@@ -14,45 +14,34 @@ use uuid::Uuid;
 use application::user::{create, delete, read, update};
 
 #[get("/<id>")]
-pub fn list_user_handler(key: ApiKey, id: String) -> Result<String, Status> {
-    match ApiKey::verify_admin_role(&key.role) {
-        true => {
-            let user = read::get_by_id(Uuid::parse_str(&id).unwrap()).unwrap();
+pub fn list_user_handler(_key: AdminApiKey, id: String) -> Result<String, Status> {
+    let user = read::get_by_id(Uuid::parse_str(&id).unwrap()).unwrap();
 
-            let response = Response {
-                body: ResponseBody::User(user),
-            };
-            Ok(serde_json::to_string(&response).unwrap())
-        }
-        _ => return Err(Status::Unauthorized),
-    }
+    let response = Response {
+        body: ResponseBody::User(user),
+    };
+    Ok(serde_json::to_string(&response).unwrap())
 }
 
 #[put("/<id>", data = "<user>")]
-pub fn update_user_handler(key: ApiKey, id: String, user: Json<User>) -> Result<String, Status> {
-    match ApiKey::verify_admin_role(&key.role) {
-        true => {
-            let user = update::update_user(id, user).unwrap();
+pub fn update_user_handler(
+    _key: AdminApiKey,
+    id: String,
+    user: Json<User>,
+) -> Result<String, Status> {
+    let user = update::update_user(id, user).unwrap();
 
-            let response = Response {
-                body: ResponseBody::User(user),
-            };
+    let response = Response {
+        body: ResponseBody::User(user),
+    };
 
-            Ok(serde_json::to_string(&response).unwrap())
-        }
-        _ => return Err(Status::Unauthorized),
-    }
+    Ok(serde_json::to_string(&response).unwrap())
 }
 
 #[delete("/<id>")]
-pub fn delete_user_handler(key: ApiKey, id: String) -> Status {
-    match ApiKey::verify_admin_role(&key.role) {
-        true => {
-            delete::delete_user(Uuid::parse_str(&id).unwrap()).unwrap();
-            Status::NoContent
-        }
-        _ => Status::Unauthorized,
-    }
+pub fn delete_user_handler(_key: AdminApiKey, id: String) -> Status {
+    delete::delete_user(Uuid::parse_str(&id).unwrap()).unwrap();
+    Status::NoContent
 }
 
 #[post("/register", format = "application/json", data = "<credentials>")]

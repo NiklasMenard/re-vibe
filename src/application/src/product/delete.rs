@@ -34,9 +34,9 @@ pub fn delete_product(id: i32) -> Result<Vec<Product>, NotFound<String>> {
             .select(products::all_columns)
             .load::<Product>(&mut establish_connection())
         {
-            Ok(mut posts_) => {
-                posts_.sort();
-                Ok(posts_)
+            Ok(mut products_) => {
+                products_.sort();
+                Ok(products_)
             }
             // doesn't seem like selecting everything will throw any errors, leaving room for specific error handling just in case though
             Err(err) => match err {

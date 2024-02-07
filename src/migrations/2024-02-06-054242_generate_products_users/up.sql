@@ -35,14 +35,15 @@ CREATE TABLE product_categories (
 -- Create the Products table
 CREATE TABLE products (
     product_id SERIAL PRIMARY KEY,
-    name VARCHAR(200) NOT NULL,
-    description TEXT NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(255) NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     quantity INT NOT NULL,
     seller_id UUID NOT NULL,
     category_id INT NOT NULL,
     creation_date TIMESTAMP NOT NULL
 );
+
 
 -- Create the ProductTags table (Many-to-Many Relationship)
 CREATE TABLE product_tags (
@@ -66,7 +67,7 @@ ALTER TABLE product_tags ADD CONSTRAINT fk_product_tags_tags FOREIGN KEY (tag_id
 -- Seed Users
 INSERT INTO users (id, name, email, password, salt, bio, profile_picture_url)
 VALUES
-    ('58346d65-40e1-4d88-b938-13588c0caa15', 'Albert Einstein', 'ADMIN', '$2y$12$xSbDr.K5c96ZcLMpENf5mO9j7bqua5YqtXYj/pBFuwao45KGByelu', 'zUdFtAM7e/8beNOrGPh7oQ==', 'Theoretical physicist known for the theory of relativity', 'url1'),
+    ('58346d65-40e1-4d88-b938-13588c0caa15', 'Albert Einstein', 'ADMIN', '$2y$12$g43/Hck5wHj0VdtgXtlc5eTkcmmIdoZJG1ar/c9.nagbEJJuI6s2G', 'i65BJem7yJl2XfviZvne7g==', 'Theoretical physicist known for the theory of relativity', 'url1'),
     ('5cf522b0-ac95-4526-a0c3-3163d38115f0', 'Marie Curie', 'mariecurie@example.com', 'hashed_password_2', 'salt_hash', 'Physicist and chemist, pioneer in radioactivity research', 'url2'),
     ('ef7903d1-ec4b-4264-bcbd-f46524d601d6', 'Charles Darwin', 'cdarwin@example.com', 'hashed_password_3', 'salt_hash', 'Naturalist, known for the theory of evolution', 'url3'),
     ('8d71442b-99f0-4557-af99-7d3e78aa1ea5', 'Isaac Newton', 'newton@example.com', 'hashed_password_4', 'salt_hash', 'Mathematician and physicist, formulated the laws of motion and universal gravitation', 'url4'),

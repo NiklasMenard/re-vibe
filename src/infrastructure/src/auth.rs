@@ -13,11 +13,54 @@ use sha2::Sha384;
 use std::collections::BTreeMap;
 use std::env;
 
-#[derive(Debug)]
+#[derive(PartialEq)]
+pub enum UserRole {
+    User,
+    Seller,
+    Admin,
+}
+
 pub struct ApiKey {
     pub key: String,
-    pub role: String,
+    pub role: UserRole,
     pub exp: String,
+}
+
+impl ApiKey {
+    fn from_claims(claims: &BTreeMap<String, String>) -> Option<Self> {
+        // Parse the role from claims
+        let role_str = claims.get("role").and_then(|role| Some(role.as_str()));
+
+        // Convert the role string to UserRole enum variant
+        let role = match role_str {
+            Some("1") => UserRole::User,
+            Some("2") => UserRole::Seller,
+            Some("3") => UserRole::Admin,
+            _ => return None, // Handle invalid role strings
+        };
+
+        Some(ApiKey {
+            key: claims.get("sub")?.to_string(),
+            role,
+            exp: claims.get("exp")?.to_string(),
+        })
+    }
+}
+
+pub struct UserApiKey(pub ApiKey);
+
+impl UserApiKey {
+    fn verify_role(role: &UserRole) -> bool {
+        *role == UserRole::User || *role == UserRole::Seller || *role == UserRole::Admin
+    }
+}
+
+pub struct AdminApiKey(pub ApiKey);
+
+impl AdminApiKey {
+    fn verify_role(role: &UserRole) -> bool {
+        *role == UserRole::Admin
+    }
 }
 
 #[derive(Responder, Debug)]
@@ -38,16 +81,6 @@ pub enum TokenReadError {
     ParsingFailure(String),
     Unauthorized,
     Expired,
-}
-
-impl ApiKey {
-    pub fn verify_user_role(role: &str) -> bool {
-        return role == "0" || role == "1";
-    }
-
-    pub fn verify_admin_role(role: &str) -> bool {
-        return role == "0";
-    }
 }
 
 fn timestamp_expired(timestamp: i64) -> bool {
@@ -82,14 +115,14 @@ pub fn read_token(incoming: &str) -> Result<ApiKey, TokenReadError> {
         return Err(TokenReadError::Expired);
     }
 
-    let new_api_key = ApiKey {
-        key: claims["sub"].clone(),
-        role: claims["role"].clone(),
-        exp: claims["exp"].to_string(),
-    };
-
     if header.algorithm == AlgorithmType::Hs384 {
-        Ok(new_api_key)
+        let new_api_key = match ApiKey::from_claims(&claims) {
+            Some(api_key) => Ok(api_key),
+            None => Err(TokenReadError::ParsingFailure(
+                "Invalid or missing claims".to_string(),
+            )),
+        };
+        new_api_key
     } else {
         Err(TokenReadError::ParsingFailure(
             "Error with algorithm type".to_string(),
@@ -144,5 +177,55 @@ impl<'r> FromRequest<'r> for ApiKey {
                 ))
             }
         };
+    }
+}
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for UserApiKey {
+    type Error = NetworkResponse;
+
+    async fn from_request(
+        request: &'r Request<'_>,
+    ) -> request::Outcome<UserApiKey, NetworkResponse> {
+        match ApiKey::from_request(request).await {
+            Outcome::Success(api_key) => {
+                if !UserApiKey::verify_role(&api_key.role) {
+                    return Outcome::Failure((
+                        Status::Unauthorized,
+                        NetworkResponse::Unauthorized("Unauthorized".to_string()),
+                    ));
+                }
+                Outcome::Success(UserApiKey(api_key))
+            }
+            Outcome::Failure((status, network_response)) => {
+                Outcome::Failure((status, network_response))
+            }
+            Outcome::Forward(()) => Outcome::Forward(()),
+        }
+    }
+}
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for AdminApiKey {
+    type Error = NetworkResponse;
+
+    async fn from_request(
+        request: &'r Request<'_>,
+    ) -> request::Outcome<AdminApiKey, NetworkResponse> {
+        match ApiKey::from_request(request).await {
+            Outcome::Success(api_key) => {
+                if !AdminApiKey::verify_role(&api_key.role) {
+                    return Outcome::Failure((
+                        Status::Unauthorized,
+                        NetworkResponse::Unauthorized("Unauthorized".to_string()),
+                    ));
+                }
+                Outcome::Success(AdminApiKey(api_key))
+            }
+            Outcome::Failure((status, network_response)) => {
+                Outcome::Failure((status, network_response))
+            }
+            Outcome::Forward(()) => Outcome::Forward(()),
+        }
     }
 }
