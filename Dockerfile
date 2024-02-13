@@ -1,12 +1,12 @@
 
 # Build Stage
-FROM rust:1.71 as chef
+FROM rust:1.76 as chef
 
 # Install cargo-chef to manage dependencies
-RUN cargo install cargo-chef
+RUN cargo install --locked cargo-chef
 
 # Set up the working directory
-WORKDIR /rust_blog
+WORKDIR /stitch
 
 # Intermediate stage for preparing dependency information
 FROM chef AS planner
@@ -22,7 +22,7 @@ RUN cargo chef prepare --recipe-path recipe.json
 
 # Intermediate stage for building and caching dependencies
 FROM chef AS builder
-COPY --from=planner /rust_blog/recipe.json recipe.json
+COPY --from=planner /stitch/recipe.json recipe.json
 
 # Build and cache dependencies using the prepared recipe
 RUN cargo chef cook --release --recipe-path recipe.json
@@ -34,7 +34,10 @@ COPY . .
 RUN cargo build --release
 
 # Deploy Stage
-FROM gcr.io/distroless/cc-debian11
+FROM debian:bookworm-slim
+
+# Install required dependencies
+RUN apt-get update && apt-get install -y libpq5 libssl-dev ca-certificates
 
 # Copy `libpq` dependencies into the image (Required by diesel)
 ARG ARCH=x86_64
@@ -60,11 +63,12 @@ COPY --from=builder /usr/lib/${ARCH}-linux-gnu/libffi.so* /usr/lib/${ARCH}-linux
 COPY --from=builder /lib/${ARCH}-linux-gnu/libcom_err.so* /lib/${ARCH}-linux-gnu/
 COPY --from=builder /lib/${ARCH}-linux-gnu/libkeyutils.so* /lib/${ARCH}-linux-gnu/
 
+
 # Application files
-COPY --from=builder /rust_blog/target/release/ /usr/src/rust_blog
+COPY --from=builder /stitch/target/release/ /usr/src/stitch
 
 # Copy Rocket.toml
 COPY ./Rocket.toml .
 
 # Run the binary
-CMD ["./usr/src/rust_blog/main"]
+CMD ["./usr/src/stitch/main"]
