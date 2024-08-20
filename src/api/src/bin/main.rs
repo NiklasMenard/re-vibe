@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate rocket;
 use rocket::fairing::{Fairing, Info, Kind};
+use rocket::fs::FileServer;
 use rocket::http::Header;
 use rocket::{Request, Response};
 
@@ -28,17 +29,38 @@ impl Fairing for CORS {
     }
 
     async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
-        // Allow requests only from http://localhost:3000
+        // Define allowed origins
+        let allowed_origins = vec!["http://127.0.0.1:3000", "http://127.0.0.1:8000"];
+
+        // Check the Origin header
         if let Some(origin) = request.headers().get_one("Origin") {
-            if origin == "http://localhost:3000" {
+            if allowed_origins.contains(&origin) {
                 response.set_header(Header::new("Access-Control-Allow-Origin", origin));
                 response.set_header(Header::new(
                     "Access-Control-Allow-Methods",
                     "POST, GET, OPTIONS",
                 ));
-                response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
+                response.set_header(Header::new(
+                    "Access-Control-Allow-Headers",
+                    "Content-Type, Authorization",
+                ));
                 response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
             }
+        }
+
+        // Handle OPTIONS requests
+        if request.method() == rocket::http::Method::Options {
+            response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
+            response.set_header(Header::new(
+                "Access-Control-Allow-Methods",
+                "POST, GET, OPTIONS",
+            ));
+            response.set_header(Header::new(
+                "Access-Control-Allow-Headers",
+                "Content-Type, Authorization",
+            ));
+            response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
+            response.set_status(rocket::http::Status::Ok);
         }
     }
 }
@@ -77,5 +99,12 @@ fn rocket() -> _ {
                 user_handler::delete_user_handler
             ],
         )
-        .mount("/auth", routes![auth_handler::login_handler,])
+        .mount(
+            "/auth",
+            routes![
+                auth_handler::login_handler,
+                auth_handler::refresh_token_handler
+            ],
+        )
+        .mount("/", FileServer::from("UI/dist"))
 }
