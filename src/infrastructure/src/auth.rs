@@ -1,25 +1,22 @@
+use chrono::{Duration, TimeZone, Utc};
+use hmac::{Hmac, Mac};
+use jwt::{AlgorithmType, Header, Token, VerifyWithKey};
+use rocket::http::Status;
 use rocket::outcome::Outcome;
 use rocket::request::{self, FromRequest, Request};
 use rocket::Responder;
-
-use rocket::http::Status;
-
-use hmac::{Hmac, Mac};
-
-use chrono::{Duration, TimeZone, Utc};
-use jwt::{AlgorithmType, Header, Token, VerifyWithKey};
-
 use sha2::Sha384;
 use std::collections::BTreeMap;
 use std::env;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum UserRole {
     User,
     Seller,
     Admin,
 }
 
+#[derive(Clone)]
 pub struct ApiKey {
     pub key: String,
     pub role: UserRole,
@@ -28,15 +25,13 @@ pub struct ApiKey {
 
 impl ApiKey {
     fn from_claims(claims: &BTreeMap<String, String>) -> Option<Self> {
-        // Parse the role from claims
         let role_str = claims.get("role").and_then(|role| Some(role.as_str()));
 
-        // Convert the role string to UserRole enum variant
         let role = match role_str {
             Some("1") => UserRole::User,
             Some("2") => UserRole::Seller,
             Some("3") => UserRole::Admin,
-            _ => return None, // Handle invalid role strings
+            _ => return None,
         };
 
         Some(ApiKey {
@@ -47,19 +42,44 @@ impl ApiKey {
     }
 }
 
+#[derive(Clone)]
 pub struct UserApiKey(pub ApiKey);
 
-impl UserApiKey {
-    fn verify_role(role: &UserRole) -> bool {
-        *role == UserRole::User || *role == UserRole::Seller || *role == UserRole::Admin
+#[derive(Clone)]
+pub struct AdminApiKey(pub ApiKey);
+
+pub trait RoleVerifier {
+    fn verify_role(&self) -> Outcome<Self, (Status, NetworkResponse), Status>
+    where
+        Self: Sized;
+}
+
+impl RoleVerifier for UserApiKey {
+    fn verify_role(&self) -> Outcome<Self, (Status, NetworkResponse), Status> {
+        if matches!(
+            self.0.role,
+            UserRole::User | UserRole::Seller | UserRole::Admin
+        ) {
+            Outcome::Success(self.clone())
+        } else {
+            Outcome::Error((
+                Status::Unauthorized,
+                NetworkResponse::Unauthorized("Unauthorized".to_string()),
+            ))
+        }
     }
 }
 
-pub struct AdminApiKey(pub ApiKey);
-
-impl AdminApiKey {
-    fn verify_role(role: &UserRole) -> bool {
-        *role == UserRole::Admin
+impl RoleVerifier for AdminApiKey {
+    fn verify_role(&self) -> Outcome<Self, (Status, NetworkResponse), Status> {
+        if matches!(self.0.role, UserRole::Admin) {
+            Outcome::Success(self.clone())
+        } else {
+            Outcome::Error((
+                Status::Unauthorized,
+                NetworkResponse::Unauthorized("Unauthorized".to_string()),
+            ))
+        }
     }
 }
 
@@ -92,7 +112,7 @@ fn timestamp_expired(timestamp: i64) -> bool {
             let time_difference = current_time - timestamp_datetime;
             time_difference <= Duration::seconds(seconds)
         }
-        _ => false, // Handle the case where timestamp parsing fails
+        _ => false,
     }
 }
 
@@ -130,65 +150,60 @@ pub fn read_token(incoming: &str) -> Result<ApiKey, TokenReadError> {
     }
 }
 
+async fn extract_token_from_request<'r>(
+    request: &'r Request<'_>,
+) -> Outcome<ApiKey, (Status, NetworkResponse), Status> {
+    let keys: Vec<_> = request.headers().get("Authorization").collect();
+
+    match keys.len() {
+        0 => Outcome::Error((
+            Status::Unauthorized,
+            NetworkResponse::Unauthorized("Unauthorized".to_string()),
+        )),
+        1 => match read_token(keys[0]) {
+            Ok(api_key) => Outcome::Success(api_key),
+            Err(err) => match err {
+                TokenReadError::Expired => Outcome::Error((
+                    Status::Unauthorized,
+                    NetworkResponse::BadRequest("Token Expired".to_string()),
+                )),
+                TokenReadError::ParsingFailure(msg) => Outcome::Error((
+                    Status::Unauthorized,
+                    NetworkResponse::BadRequest(msg.to_string()),
+                )),
+                _ => Outcome::Error((
+                    Status::BadRequest,
+                    NetworkResponse::BadRequest("Bad request".to_string()),
+                )),
+            },
+        },
+        _ => Outcome::Error((
+            Status::BadRequest,
+            NetworkResponse::BadRequest("Bad request".to_string()),
+        )),
+    }
+}
+
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for ApiKey {
     type Error = NetworkResponse;
 
     async fn from_request(request: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
-        let keys: Vec<_> = request.headers().get("Authorization").collect();
-
-        match keys.len() {
-            0 => {
-                return Outcome::Error((
-                    Status::Unauthorized,
-                    NetworkResponse::Unauthorized("Unauthorized".to_string()),
-                ));
-            }
-            1 => match read_token(keys[0]) {
-                Ok(api_key) => Outcome::Success(api_key),
-                Err(err) => match err {
-                    TokenReadError::Expired => Outcome::Error((
-                        Status::Unauthorized,
-                        NetworkResponse::BadRequest("Token Expired".to_string()),
-                    )),
-
-                    TokenReadError::ParsingFailure(msg) => Outcome::Error((
-                        Status::Unauthorized,
-                        NetworkResponse::BadRequest(msg.to_string()),
-                    )),
-                    _ => Outcome::Error((
-                        Status::BadRequest,
-                        NetworkResponse::BadRequest("Bad request".to_string()),
-                    )),
-                },
-            },
-            _ => Outcome::Error((
-                Status::BadRequest,
-                NetworkResponse::BadRequest("Bad request".to_string()),
-            )),
-        }
+        extract_token_from_request(request).await
     }
 }
+
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for UserApiKey {
     type Error = NetworkResponse;
 
-    async fn from_request(
-        request: &'r Request<'_>,
-    ) -> request::Outcome<UserApiKey, NetworkResponse> {
-        match ApiKey::from_request(request).await {
+    async fn from_request(request: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
+        match extract_token_from_request(request).await {
             Outcome::Success(api_key) => {
-                if !UserApiKey::verify_role(&api_key.role) {
-                    return Outcome::Error((
-                        Status::Unauthorized,
-                        NetworkResponse::Unauthorized("Unauthorized".to_string()),
-                    ));
-                }
-                Outcome::Success(UserApiKey(api_key))
+                let user_api_key = UserApiKey(api_key);
+                user_api_key.verify_role()
             }
-            Outcome::Error((status, network_response)) => {
-                Outcome::Error((status, network_response))
-            }
+            Outcome::Error((status, response)) => Outcome::Error((status, response)),
             Outcome::Forward(status) => Outcome::Forward(status),
         }
     }
@@ -198,22 +213,13 @@ impl<'r> FromRequest<'r> for UserApiKey {
 impl<'r> FromRequest<'r> for AdminApiKey {
     type Error = NetworkResponse;
 
-    async fn from_request(
-        request: &'r Request<'_>,
-    ) -> request::Outcome<AdminApiKey, NetworkResponse> {
-        match ApiKey::from_request(request).await {
+    async fn from_request(request: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
+        match extract_token_from_request(request).await {
             Outcome::Success(api_key) => {
-                if !AdminApiKey::verify_role(&api_key.role) {
-                    return Outcome::Error((
-                        Status::Unauthorized,
-                        NetworkResponse::Unauthorized("Unauthorized".to_string()),
-                    ));
-                }
-                Outcome::Success(AdminApiKey(api_key))
+                let admin_api_key = AdminApiKey(api_key);
+                admin_api_key.verify_role()
             }
-            Outcome::Error((status, network_response)) => {
-                Outcome::Error((status, network_response))
-            }
+            Outcome::Error((status, response)) => Outcome::Error((status, response)),
             Outcome::Forward(status) => Outcome::Forward(status),
         }
     }
