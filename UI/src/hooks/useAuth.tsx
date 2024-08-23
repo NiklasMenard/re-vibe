@@ -1,22 +1,12 @@
 import { jwtDecode } from 'jwt-decode';
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { statusCodeMessages } from '../constants/requests';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const REFRESH_THRESHOLD = 60;
 
 const TOKEN_KEY = 'jwt_token';
-
-const statusCodeMessages: { [key: number]: string } = {
-  400: 'Bad request. Please check your input and try again.',
-  401: 'Incorrect password or username.',
-  403: 'Forbidden. You do not have permission to perform this action.',
-  404: 'Resource not found. Please check the URL or try again later.',
-  500: 'An error occurred on the server. Please try again later.',
-  502: 'Bad gateway. The server received an invalid response from an upstream server.',
-  503: 'Service is temporarily unavailable. Please try again later.',
-  504: 'The server took too long to respond. Please try again later.',
-};
-
 type LoginFunction = (username: string, password: string) => Promise<void>;
 
 export function useAuth() {
@@ -69,7 +59,7 @@ export function useAuth() {
     navigate('/');
   }, [navigate]);
 
-  // Function to handle refreshing the token using the refresh token
+  // Function to handle refreshing the token using the refresh token from localstorage
   const refreshAuthToken = useCallback(async () => {
     const token = localStorage.getItem(TOKEN_KEY);
     if (!token) {
@@ -108,9 +98,10 @@ export function useAuth() {
   useEffect(() => {
     if (token) {
       const decoded = jwtDecode<{ exp: number }>(token);
-
       const currentTime = Date.now() / 1000;
-      if (decoded.exp < currentTime) {
+
+      // Check if the token is about to expire within the threshold
+      if (decoded.exp < currentTime + REFRESH_THRESHOLD) {
         refreshAuthToken();
       }
     } else {

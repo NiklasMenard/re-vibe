@@ -1,53 +1,24 @@
-import { useEffect, useState } from 'react';
-import { Product, ProductsResponse } from '../types'; // Adjust the path as necessary
-import { useAuth } from '../hooks/useAuth';
-import { FlexFill } from '../styles/layouts';
 import styled from 'styled-components';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { ProductsResponse } from '../types'; // Adjust the path as necessary
+import { useAuth } from '../hooks/useAuth';
+import { FlexFill } from '../styles/layouts';
+
+import useFetch from '../hooks/useFetch';
 
 const Products = () => {
-  // State to store products and any errors
-  const [products, setProducts] = useState<Product[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const { token, refreshAuthToken } = useAuth();
+  const { refreshAuthToken, logout } = useAuth();
+  const { data, loading, error } = useFetch<ProductsResponse>(`/api/products`);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL ?? ''}/api/products`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const data: ProductsResponse = await response.json();
-        setProducts(data.body.Products);
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError('An unknown error occurred');
-        }
-      }
-    };
-
-    fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const products = data?.products || [];
 
   return (
     <FlexFill>
       <ProductsContainer>
         <h1>Products</h1>
         <button onClick={() => refreshAuthToken()}>Refresh</button>
-        <button onClick={() => refreshAuthToken()}>Logout</button>
+        <button onClick={() => logout()}>Logout</button>
+        {loading && <p>Loading...</p>}
         {error && <p>Error: {error}</p>}
         {products.length === 0 ? (
           <p>No products found</p>
