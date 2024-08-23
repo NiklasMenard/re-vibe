@@ -13,7 +13,5 @@ export type Product = {
   
 
   export type ProductsResponse = {
-    body: {
-      Products: Product[];
-    };
+    products: Product[];
   };

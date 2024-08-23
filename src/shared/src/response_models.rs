@@ -4,6 +4,7 @@ use domain::models::{Product, User};
 use rocket::serde::Serialize;
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub enum ResponseBody {
     Message(String),
     Product(Product),
