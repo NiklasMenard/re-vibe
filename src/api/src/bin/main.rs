@@ -1,8 +1,9 @@
 #[macro_use]
 extern crate rocket;
+
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::fs::FileServer;
-use rocket::http::Header;
+use rocket::http::{Header, Status};
 use rocket::{Request, Response};
 
 use api::auth_handler;
@@ -32,7 +33,6 @@ impl Fairing for CORS {
         // Define allowed origins
         let allowed_origins = vec!["http://127.0.0.1:3000", "http://127.0.0.1:8000"];
 
-        // Check the Origin header
         if let Some(origin) = request.headers().get_one("Origin") {
             if allowed_origins.contains(&origin) {
                 response.set_header(Header::new("Access-Control-Allow-Origin", origin));
@@ -48,19 +48,27 @@ impl Fairing for CORS {
             }
         }
 
-        // Handle OPTIONS requests
+        // Handle OPTIONS requests (preflight requests)
         if request.method() == rocket::http::Method::Options {
-            response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
-            response.set_header(Header::new(
-                "Access-Control-Allow-Methods",
-                "POST, GET, OPTIONS",
-            ));
-            response.set_header(Header::new(
-                "Access-Control-Allow-Headers",
-                "Content-Type, Authorization",
-            ));
-            response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
-            response.set_status(rocket::http::Status::Ok);
+            if let Some(origin) = request.headers().get_one("Origin") {
+                if allowed_origins.contains(&origin) {
+                    response.set_header(Header::new("Access-Control-Allow-Origin", origin));
+                    response.set_header(Header::new(
+                        "Access-Control-Allow-Methods",
+                        "POST, GET, OPTIONS",
+                    ));
+                    response.set_header(Header::new(
+                        "Access-Control-Allow-Headers",
+                        "Content-Type, Authorization",
+                    ));
+                    response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
+                    response.set_status(Status::Ok);
+                } else {
+                    response.set_status(Status::Forbidden);
+                }
+            } else {
+                response.set_status(Status::Forbidden);
+            }
         }
     }
 }
