@@ -7,7 +7,7 @@ import { FlexFill } from '../styles/layouts';
 import useFetch from '../hooks/useFetch';
 
 const Products = () => {
-  const { refreshAuthToken, logout } = useAuth();
+  const { logout } = useAuth();
   const { data, loading, error } = useFetch<ProductsResponse>(`/api/products`);
 
   const products = data?.products || [];
@@ -16,7 +16,6 @@ const Products = () => {
     <FlexFill>
       <ProductsContainer>
         <h1>Products</h1>
-        <button onClick={() => refreshAuthToken()}>Refresh</button>
         <button onClick={() => logout()}>Logout</button>
         {loading && <p>Loading...</p>}
         {error && <p>Error: {error}</p>}

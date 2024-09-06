@@ -1,7 +1,7 @@
 
 export const statusCodeMessages: { [key: number]: string } = {
     400: 'Bad request. Please check your input and try again.',
-    401: 'Incorrect password or username.',
+    401: 'Invalid credentials.',
     403: 'Forbidden. You do not have permission to perform this action.',
     404: 'Resource not found. Please check the URL or try again later.',
     500: 'An error occurred on the server. Please try again later.',

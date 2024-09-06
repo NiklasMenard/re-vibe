@@ -27,28 +27,39 @@ const useFetch = <T,>(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const { token } = useAuth();
+  const { token, refreshAuthToken } = useAuth();
 
-  const fetchData = useCallback(async () => {
+  const getData = useCallback(async () => {
+    let accessToken = token;
+    // If token is not set, refresh it
+    if (!accessToken) {
+      accessToken = await refreshAuthToken();
+    }
+
+    // Proceed to fetch data with the token
+    const response = await fetch(`${API_BASE_URL ?? ''}${url}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`, // Use the refreshed token
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const message = statusCodeMessages[response.status] || 'An unknown error occurred.';
+      throw new Error(message);
+    }
+
+    const result: ApiResponse<T> = await response.json();
+    setData(result.body);
+  }, [refreshAuthToken, token, url]);
+
+  const fetchData = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL ?? ''}/${url}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const message = statusCodeMessages[response.status] || 'An unknown error occurred.';
-        throw new Error(message);
-      }
-
-      const result: ApiResponse<T> = await response.json();
-      setData(result.body);
+      await getData();
     } catch (error) {
       if (error instanceof Error) {
         setError(error);
@@ -58,7 +69,7 @@ const useFetch = <T,>(
     } finally {
       setLoading(false);
     }
-  }, [token, url]);
+  };
 
   useEffect(() => {
     if (options.refresh) {
