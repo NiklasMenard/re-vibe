@@ -31,7 +31,12 @@ impl Fairing for CORS {
 
     async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
         // Define allowed origins
-        let allowed_origins = vec!["http://127.0.0.1:3000", "http://127.0.0.1:8000"];
+        let allowed_origins = vec![
+            "http://localhost:3000",
+            "http://localhost:8000",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:8000",
+        ];
 
         if let Some(origin) = request.headers().get_one("Origin") {
             if allowed_origins.contains(&origin) {
@@ -86,7 +91,10 @@ fn rocket() -> _ {
 
     rocket::build()
         .attach(CORS)
-        .register("/", catchers![catcher_handler::unauthorized])
+        .register(
+            "/",
+            catchers![catcher_handler::unauthorized, catcher_handler::not_found],
+        )
         .mount("/", routes![catcher_handler::all_options])
         .mount(
             "/api",
@@ -111,7 +119,8 @@ fn rocket() -> _ {
             "/auth",
             routes![
                 auth_handler::login_handler,
-                auth_handler::refresh_token_handler
+                auth_handler::refresh_token_handler,
+                auth_handler::logout
             ],
         )
         .mount("/", FileServer::from("UI/dist"))

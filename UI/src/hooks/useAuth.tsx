@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { statusCodeMessages } from '../constants/requests';
 import { createContext } from 'react';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const REFRESH_THRESHOLD = 300;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
+const REFRESH_THRESHOLD = 30;
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -28,10 +28,6 @@ const defaultAuthContext: AuthContextType = {
   error: null,
   isAuthenticated: () => false,
   refreshAuthToken: async () => null,
-};
-
-const deleteCookie = (name: string, path: string = '/', domain: string = 'localhost') => {
-  document.cookie = `${name}=; Path=${path}; Domain=${domain}; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Secure; SameSite=None;`;
 };
 
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
@@ -79,8 +75,18 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     [navigate]
   );
 
-  const logout = useCallback(() => {
-    deleteCookie('refresh_token', '/');
+  const logout = useCallback(async () => {
+    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const message = statusCodeMessages[response.status] || 'An unknown error occurred.';
+      logout();
+      throw new Error(message);
+    }
+
     setToken(null);
     navigate('/');
   }, [navigate]);
@@ -91,10 +97,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       method: 'POST',
       credentials: 'include',
     });
-
-    if (!token) {
-      logout();
-    }
 
     if (!response.ok) {
       const message = statusCodeMessages[response.status] || 'An unknown error occurred.';
@@ -112,7 +114,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       logout();
       return null;
     }
-  }, [logout, token]);
+  }, [logout]);
 
   const isAuthenticated = useCallback(() => {
     return !!token;
