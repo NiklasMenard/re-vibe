@@ -166,3 +166,9 @@ pub fn refresh_token_handler(cookies: &CookieJar<'_>) -> Result<Json<Value>, Sta
         Err(Status::Unauthorized) // No refresh token in cookies
     }
 }
+
+#[post("/logout")]
+pub fn logout(cookies: &CookieJar<'_>) {
+    // `path` and `SameSite` are set to defaults (`/` and `Lax`)
+    cookies.remove("refresh_token");
+}
