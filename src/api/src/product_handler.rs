@@ -10,7 +10,7 @@ use rocket::{delete, get, post, put};
 use shared::response_models::{Response, ResponseBody};
 
 #[get("/products")]
-pub fn list_products_handler(_key: UserApiKey) -> Result<String, Status> {
+pub fn list_products_handler() -> Result<String, Status> {
     let products = read::list_products();
 
     let response = Response {
@@ -21,7 +21,7 @@ pub fn list_products_handler(_key: UserApiKey) -> Result<String, Status> {
 }
 
 #[get("/products/<product_id>")]
-pub fn list_product_handler(_key: UserApiKey, product_id: i32) -> Result<String, Status> {
+pub fn list_product_handler(product_id: i32) -> Result<String, Status> {
     let found_product = read::list_product(product_id).unwrap();
 
     let response = Response {

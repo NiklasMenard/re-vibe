@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useState } from 'react';
-import { FlexFill } from '../styles/layouts';
+import { FlexColumn } from '../styles/layouts';
 import { useAuth } from '../hooks/useAuth';
 
 const LoginPage = () => {
@@ -15,9 +15,9 @@ const LoginPage = () => {
   };
 
   return (
-    <FlexFill>
+    <FlexColumn>
       <LoginContainer>
-        <h2>Login</h2>
+        <h2>Login BOMBO</h2>
         <div className="error">{error}</div>
         <LoginForm onSubmit={handleSubmit}>
           <div className="form-group">
@@ -44,7 +44,7 @@ const LoginPage = () => {
           <button type="submit">Login</button>
         </LoginForm>
       </LoginContainer>
-    </FlexFill>
+    </FlexColumn>
   );
 };
 

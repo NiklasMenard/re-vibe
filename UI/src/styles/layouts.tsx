@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const FlexFill = styled.div`
+export const FlexColumn = styled.div`
   display: flex;
-  height: 100%;
+  flex-direction: column;
 `;

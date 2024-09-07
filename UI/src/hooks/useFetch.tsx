@@ -6,6 +6,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
 interface FetchOptions {
   refresh?: boolean;
+  auth?: boolean;
 }
 
 interface ApiResponse<T> {
@@ -19,64 +20,68 @@ interface UseFetchResponse<T> {
   fetchData: () => Promise<void>;
 }
 
-const useFetch = <T,>(
-  url: string,
-  options: FetchOptions = { refresh: true }
-): UseFetchResponse<T> => {
+const useFetch = <T,>(url: string, options: FetchOptions = {}): UseFetchResponse<T> => {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { token, refreshAuthToken, logout } = useAuth();
 
-  const fetchDataWithToken = useCallback(
-    async (token: string) => {
-      try {
-        const response = await fetch(`${API_BASE_URL}${url}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
+  // Default options
+  const defaultOptions: FetchOptions = {
+    refresh: true,
+    auth: true,
+  };
 
-        if (!response.ok) {
-          const message = statusCodeMessages[response.status] || 'An unknown error occurred.';
-          throw new Error(message);
-        }
-
-        const result: ApiResponse<T> = await response.json();
-        setData(result.body);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred.');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [url]
-  );
+  // Merge default options with user-provided options
+  const mergedOptions = { ...defaultOptions, ...options };
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
 
-    if (token) {
-      await fetchDataWithToken(token);
-    } else {
-      const newToken = await refreshAuthToken();
-      if (newToken) {
-        await fetchDataWithToken(newToken);
-      } else {
-        logout();
+    try {
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      if (mergedOptions.auth) {
+        if (!token) {
+          const newToken = await refreshAuthToken();
+          if (!newToken) {
+            logout();
+            return;
+          }
+          headers['Authorization'] = `Bearer ${newToken}`;
+        } else {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
       }
+
+      const response = await fetch(`${API_BASE_URL}${url}`, {
+        method: 'GET',
+        headers: headers,
+      });
+
+      if (!response.ok) {
+        const message = statusCodeMessages[response.status] || 'An unknown error occurred.';
+        throw new Error(message);
+      }
+
+      const result: ApiResponse<T> = await response.json();
+      setData(result.body);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+    } finally {
+      setLoading(false);
     }
-  }, [fetchDataWithToken, logout, refreshAuthToken, token]);
+  }, [url, token, refreshAuthToken, logout, mergedOptions.auth]);
 
   useEffect(() => {
-    if (options.refresh) {
+    if (mergedOptions.refresh) {
       fetchData();
     }
-  }, [fetchData, options.refresh]);
+  }, [fetchData, mergedOptions.refresh]);
 
   return { data, loading, error, fetchData };
 };

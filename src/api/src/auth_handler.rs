@@ -69,18 +69,11 @@ fn generate_tokens(
     ))
 }
 
-fn generate_refresh_token(token: String) -> Cookie<'static> {
+fn generate_refresh_cookie(token: String) -> Cookie<'static> {
     let mut cookie = Cookie::new("refresh_token", token);
     cookie.set_http_only(true);
+    cookie.set_same_site(SameSite::Strict);
     cookie.set_secure(true);
-
-    let same_site = if cfg!(debug_assertions) {
-        SameSite::None // Use Lax in development
-    } else {
-        SameSite::Strict // Use Strict in production
-    };
-
-    cookie.set_same_site(same_site);
     cookie.set_path("/");
 
     cookie
@@ -105,7 +98,7 @@ pub fn login_handler(
             )?;
 
             // Set the refresh token in an HTTP-only cookie
-            let cookie = generate_refresh_token(refresh_token);
+            let cookie = generate_refresh_cookie(refresh_token);
             cookies.add(cookie);
 
             // Return the access token in the response body
@@ -151,7 +144,7 @@ pub fn refresh_token_handler(cookies: &CookieJar<'_>) -> Result<Json<Value>, Sta
 
         // Create a new refresh token cookie
 
-        let new_cookie = generate_refresh_token(new_refresh_token.clone());
+        let new_cookie = generate_refresh_cookie(new_refresh_token.clone());
 
         // Add the new cookie to the jar
         cookies.add(new_cookie);
@@ -169,6 +162,11 @@ pub fn refresh_token_handler(cookies: &CookieJar<'_>) -> Result<Json<Value>, Sta
 
 #[post("/logout")]
 pub fn logout(cookies: &CookieJar<'_>) {
-    // `path` and `SameSite` are set to defaults (`/` and `Lax`)
-    cookies.remove("refresh_token");
+    let mut cookie = Cookie::new("refresh_token", "");
+    cookie.set_http_only(true);
+    cookie.set_same_site(SameSite::Strict);
+    cookie.set_secure(true);
+    cookie.set_path("/");
+
+    cookies.remove(cookie);
 }

@@ -1,22 +1,26 @@
 import styled from 'styled-components';
 
 import { ProductsResponse } from '../types'; // Adjust the path as necessary
-import { useAuth } from '../hooks/useAuth';
-import { FlexFill } from '../styles/layouts';
+
+import { FlexColumn } from '../styles/layouts';
 
 import useFetch from '../hooks/useFetch';
+import Header from '../components/Header';
 
 const Products = () => {
-  const { logout } = useAuth();
-  const { data, loading, error } = useFetch<ProductsResponse>(`/api/products`);
+  const { data, loading, error } = useFetch<ProductsResponse>(`/api/products`, {
+    refresh: true,
+    auth: false,
+  });
 
   const products = data?.products || [];
 
   return (
-    <FlexFill>
+    <FlexColumn>
+      <Header />
       <ProductsContainer>
         <h1>Products</h1>
-        <button onClick={() => logout()}>Logout</button>
+
         {loading && <p>Loading...</p>}
         {error && <p>Error: {error}</p>}
         {products.length === 0 ? (
@@ -36,16 +40,14 @@ const Products = () => {
           </ul>
         )}
       </ProductsContainer>
-    </FlexFill>
+    </FlexColumn>
   );
 };
 
 const ProductsContainer = styled.div`
   display: flex;
-  justify-content: center;
   flex-direction: column;
   margin: auto;
-
   button {
     margin-bottom: 1rem;
   }

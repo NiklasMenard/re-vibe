@@ -13,6 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libclang-dev libssl-dev pkg-config
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -26,7 +31,8 @@ jobs:
         uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
-          toolchain: stable
+          toolchain: '1.76.0'
+          override: true
 
       - name: Build and test code
         run: |
@@ -74,7 +80,6 @@ jobs:
         run: |
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> $GITHUB_ENV
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
-
 
       - name: Deploy
         uses: appleboy/ssh-action@master
