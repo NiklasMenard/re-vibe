@@ -53,7 +53,7 @@ CREATE TABLE product_tags (
 );
 
 -- Create the Tags table
-CREATE TABLE tags (
+CREATE TABLE IF NOT EXISTS tags (
     tag_id SERIAL PRIMARY KEY,
     name VARCHAR(50)
 );

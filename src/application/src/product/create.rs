@@ -20,6 +20,7 @@ pub fn post_product(product: Json<NewProduct>) -> Created<String> {
         quantity: new_data.quantity,
         seller_id: new_data.seller_id,
         category_id: new_data.category_id,
+        bucket_key: new_data.bucket_key,
     };
 
     match diesel::insert_into(products::table)

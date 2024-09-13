@@ -3,6 +3,7 @@ import PrimaryButton from '../components/Buttons';
 import { useNavigate } from 'react-router-dom';
 
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const Home = () => {
         <FeatureImage>pictures</FeatureImage>
       </ContentGrid>
 
-      <Footer>Footer</Footer>
+      <Footer />
     </HomeLayout>
   );
 };
@@ -41,14 +42,15 @@ const Home = () => {
 const HomeLayout = styled.div`
   display: flex;
   flex-direction: column;
+  height: 100%;
 `;
 
 const ContentGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(4, 1fr);
-  height: 90vh;
-
+  height: 100%;
+  padding-top: 7rem;
   div {
     border-bottom: 1px solid ${({ theme }) => theme.colors.jet};
   }
@@ -68,6 +70,7 @@ const HeroText = styled.div`
 
 const HeroImage = styled.div`
   background-color: lightgray;
+  min-height: 15rem;
 `;
 
 const FeatureText = styled.div`
@@ -80,12 +83,7 @@ const FeatureText = styled.div`
 
 const FeatureImage = styled.div`
   background-color: lightgray;
-`;
-
-const Footer = styled.footer`
-  display: flex;
-  height: 5vh;
-  background-color: ${({ theme }) => theme.colors.viridian};
+  min-height: 15rem;
 `;
 
 export default Home;

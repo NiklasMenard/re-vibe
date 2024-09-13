@@ -10,8 +10,8 @@ use rocket::{delete, get, post, put};
 use shared::response_models::{Response, ResponseBody};
 
 #[get("/products")]
-pub fn list_products_handler() -> Result<String, Status> {
-    let products = read::list_products();
+pub async fn list_products_handler() -> Result<String, Status> {
+    let products = read::list_products().await;
 
     let response = Response {
         body: ResponseBody::Products(products),

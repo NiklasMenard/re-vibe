@@ -28,6 +28,8 @@ diesel::table! {
         seller_id -> Uuid,
         category_id -> Int4,
         creation_date -> Timestamp,
+        #[max_length = 255]
+        bucket_key -> Varchar,
     }
 }
 

@@ -9,6 +9,7 @@ export type Product = {
     seller_id: string;
     category_id: number;
     creation_date: string; 
+    bucket_key: string
   };
   
 

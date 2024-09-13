@@ -106,6 +106,7 @@ pub struct Product {
     pub seller_id: Uuid,
     pub category_id: i32,
     pub creation_date: NaiveDateTime,
+    pub bucket_key: String,
 }
 
 #[derive(Insertable, Deserialize)]
@@ -118,6 +119,7 @@ pub struct NewProduct {
     pub quantity: i32,
     pub seller_id: Uuid,
     pub category_id: i32,
+    pub bucket_key: String,
 }
 
 // Struct for the Tags table

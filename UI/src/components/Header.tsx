@@ -10,13 +10,14 @@ const Header = () => {
 };
 
 const HeaderWrapper = styled.header`
-  display: flex;
-  background-color: #ffff;
-  padding: 0 1.5rem;
-  text-align: center;
-  font-size: 1.5rem;
-  height: 5vh;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.jet};
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+  background: #fff;
+  border-bottom: 1px solid #ccc;
+  padding: 1rem;
+  height: 7rem;
 `;
 
 export default Header;

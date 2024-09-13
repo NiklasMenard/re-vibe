@@ -31,7 +31,7 @@ jobs:
         uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
-          toolchain: '1.76.0'
+          toolchain: '1.81.0'
           override: true
 
       - name: Build and test code
@@ -80,6 +80,8 @@ jobs:
         run: |
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> $GITHUB_ENV
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+          echo "DIGITAL_OCEAN_ACCESS_KEY=${{ secrets.DIGITAL_OCEAN_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "DIGITAL_SECRET_ACCESS_KEY=${{ secrets.DIGITAL_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
 
       - name: Deploy
         uses: appleboy/ssh-action@master
@@ -91,6 +93,8 @@ jobs:
             cd ~
             export "POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}"
             export "JWT_SECRET=${{ env.JWT_SECRET }}"
+            export "DIGITAL_OCEAN_ACCESS_KEY=${{ env.DIGITAL_OCEAN_ACCESS_KEY }}"
+            export "DIGITAL_SECRET_ACCESS_KEY=${{ env.DIGITAL_SECRET_ACCESS_KEY }}"
             docker-compose down
             docker-compose pull
             docker-compose up -d

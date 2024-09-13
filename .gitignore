@@ -30,3 +30,7 @@ dist-ssr
 
 # Env
 .env*
+
+#ignore bucket helper files and folders
+/bucket
+/sync_bucket.sh
