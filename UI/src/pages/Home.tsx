@@ -1,89 +1,52 @@
-import styled from 'styled-components';
-import PrimaryButton from '../components/Buttons';
 import { useNavigate } from 'react-router-dom';
-
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { Button } from '@/components/Buttons';
 
 const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <HomeLayout>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <ContentGrid>
-        <HeroText>
-          <h1>Medium length hero heading goes here</h1>
-          <p>
+      <div className="flex-grow grid grid-cols-1 grid-rows-4  pt-28 md:grid-cols-2 md:grid-rows-2">
+        <div className="flex flex-col justify-center p-10 bg-yellow-100 border-b border-gray-300 h-full">
+          <h1 className="text-3xl font-bold mb-4">Medium length hero heading goes here</h1>
+          <p className="text-lg mb-4">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros
             elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut
             commodo diam libero vitae erat.
           </p>
-          <PrimaryButton onClick={() => navigate('/products')}>Explore</PrimaryButton>
-        </HeroText>
-        <HeroImage>pictures</HeroImage>
+          <Button
+            onClick={() => navigate('/products')}
+            className="bg-jet text-white hover:bg-coral w-[25rem]"
+          >
+            Explore
+          </Button>
+        </div>
+        <div className="bg-gray-200 min-h-[15rem] h-full">
+          {/* Will add image here */}
+          <p>pictures</p>
+        </div>
 
-        <FeatureText>
-          <h2>Discover the Easiest Way to Buy and Sell Products Online</h2>
-          <p>
+        <div className="flex flex-col justify-center p-10 bg-orange-100 border-b border-gray-300 h-full">
+          <h2 className="text-2xl font-semibold mb-4">
+            Discover the Easiest Way to Buy and Sell Products Online
+          </h2>
+          <p className="text-lg">
             Our platform offers a seamless and secure experience for buying and selling a wide
             variety of products. With intuitive navigation and secure transactions, you can trust us
             to provide a user-friendly marketplace for all your needs.
           </p>
-        </FeatureText>
-        <FeatureImage>pictures</FeatureImage>
-      </ContentGrid>
-
+        </div>
+        <div className="bg-gray-200 min-h-[15rem] h-full">
+          {/* Will add image here */}
+          <p>pictures</p>
+        </div>
+      </div>
       <Footer />
-    </HomeLayout>
+    </div>
   );
 };
-
-const HomeLayout = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-`;
-
-const ContentGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: repeat(4, 1fr);
-  height: 100%;
-  padding-top: 7rem;
-  div {
-    border-bottom: 1px solid ${({ theme }) => theme.colors.jet};
-  }
-  @media ${({ theme }) => theme.devices.md} {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-  }
-`;
-
-const HeroText = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 2.5rem;
-  background-color: ${({ theme }) => theme.colors.vanilla};
-`;
-
-const HeroImage = styled.div`
-  background-color: lightgray;
-  min-height: 15rem;
-`;
-
-const FeatureText = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 2.5rem;
-  background-color: ${({ theme }) => theme.colors.coral};
-`;
-
-const FeatureImage = styled.div`
-  background-color: lightgray;
-  min-height: 15rem;
-`;
 
 export default Home;

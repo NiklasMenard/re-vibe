@@ -1,23 +1,11 @@
-import styled from 'styled-components';
 import Logo from './Logo';
 
 const Header = () => {
   return (
-    <HeaderWrapper>
+    <div className="fixed flex top-0 w-full z-1 bg-white border-b-gray-300 h-[7rem] px-8">
       <Logo />
-    </HeaderWrapper>
+    </div>
   );
 };
-
-const HeaderWrapper = styled.header`
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1;
-  background: #fff;
-  border-bottom: 1px solid #ccc;
-  padding: 1rem;
-  height: 7rem;
-`;
 
 export default Header;
