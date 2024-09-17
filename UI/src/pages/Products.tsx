@@ -22,7 +22,7 @@ const Products = () => {
   return (
     <>
       <Header />
-      <div className="flex align-middle flex-col pt-[15rem]">
+      <div className="flex align-middle flex-col pt-[10rem]">
         <h1 className="text-center mb-[2rem]">Products</h1>
 
         {loading && <p>Loading...</p>}

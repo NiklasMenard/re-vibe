@@ -10,7 +10,7 @@ const Home = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <div className="flex-grow grid grid-cols-1 grid-rows-4  pt-28 md:grid-cols-2 md:grid-rows-2">
-        <div className="flex flex-col justify-center p-10 bg-yellow-100 border-b border-gray-300 h-full">
+        <div className="flex flex-col justify-center  bg-yellow-100 border-b border-gray-300 h-full p-[1rem]">
           <h1 className="text-3xl font-bold mb-4">Medium length hero heading goes here</h1>
           <p className="text-lg mb-4">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros
@@ -19,7 +19,7 @@ const Home = () => {
           </p>
           <Button
             onClick={() => navigate('/products')}
-            className="bg-jet text-white hover:bg-coral w-[25rem]"
+            className="bg-jet text-white hover:bg-coral w-full lg:w-[25rem]"
           >
             Explore
           </Button>
