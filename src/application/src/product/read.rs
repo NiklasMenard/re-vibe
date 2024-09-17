@@ -27,14 +27,16 @@ pub async fn list_products() -> Vec<Product> {
     // Fetch S3 client
     let mut products_with_urls = Vec::new();
     for product in products {
+        let bucket_key_with_extension = format!("medium_images/{}.jpg", &product.bucket_key);
+
         let image_url = generate_presigned_url(
             &client,
             "re-vibe",
-            &product.bucket_key,
+            &bucket_key_with_extension,
             3600, // URL expiration time in seconds
         )
         .await
-        .unwrap(); // Handle the error as needed
+        .unwrap();
 
         products_with_urls.push(Product {
             product_id: product.product_id,
@@ -49,7 +51,6 @@ pub async fn list_products() -> Vec<Product> {
         });
     }
 
-    // Sort products if necessary
     products_with_urls.sort_by(|a, b| a.name.cmp(&b.name));
 
     products_with_urls
