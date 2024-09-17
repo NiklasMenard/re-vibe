@@ -13,7 +13,7 @@ const Products = () => {
     auth: false,
   });
 
-  const products = data?.products.slice(0, 5) || [];
+  const products = data?.products.slice(0, 10) || [];
 
   return (
     <FlexColumn>
@@ -36,7 +36,6 @@ const Products = () => {
                 <p>Category ID: {product.category_id}</p>
                 <p>Creation Date: {new Date(product.creation_date).toLocaleDateString()}</p>
                 <img src={product.bucket_key} alt={product.name} loading="lazy" />
-                <img></img>
               </li>
             ))}
           </ul>
