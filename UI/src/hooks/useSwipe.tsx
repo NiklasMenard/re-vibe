@@ -21,7 +21,7 @@ const useSwipe = (onSwipe: (direction: 'left' | 'right') => void) => {
   const swipeProps = {
     onTouchStart: handleTouchStart,
     onTouchEnd: handleTouchEnd,
-    style: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
+    swipeStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
   };
 
   return swipeProps;

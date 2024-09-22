@@ -1,8 +1,9 @@
 import useSwipe from '@/hooks/useSwipe';
 import React, { useState } from 'react';
+import { Skeleton } from './Skeleton';
 
 interface CarouselProps {
-  overlay: boolean;
+  loading: boolean;
   children: React.ReactNode[];
 }
 
@@ -38,7 +39,28 @@ const generateOverlay = (currentIndex: number, index: number) => {
   }
 };
 
-const Carousel: React.FC<CarouselProps> = ({ overlay, children }) => {
+interface CardWrapperProps {
+  index?: number;
+  currentIndex?: number;
+  style?: React.CSSProperties;
+  onTouchStart?: (e: React.TouchEvent<HTMLDivElement>) => void;
+  onTouchEnd?: (e: React.TouchEvent<HTMLDivElement>) => void;
+  className?: string;
+  children: React.ReactNode;
+}
+
+const CardWrapper: React.FC<CardWrapperProps> = ({ children, className, ...props }) => {
+  return (
+    <div
+      className={`absolute flex items-center justify-center transition-transform duration-300 ease-linear ${className}`}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};
+
+const Carousel: React.FC<CarouselProps> = ({ loading, children }) => {
   const [currentIndex, setCurrentIndex] = useState<number>(2);
 
   const prevSlide = (): void => {
@@ -49,23 +71,6 @@ const Carousel: React.FC<CarouselProps> = ({ overlay, children }) => {
     setCurrentIndex((prevIndex) =>
       prevIndex === children.length - 1 ? children.length - 1 : prevIndex + 1
     );
-  };
-
-  const animatePosition = (index: number) => {
-    // Center card
-    if (index === currentIndex) {
-      return 'translate-x-0 scale-110 opacity-100';
-    }
-
-    // Cards to the left of current card
-    if (index < currentIndex) {
-      return 'translate-x-[65%] scale-75 '; // Move to left
-    }
-
-    // Cards to the right of current card
-    if (index > currentIndex) {
-      return '-translate-x-[65%] scale-75 '; // Move to right
-    }
   };
 
   const calculateZIndex = (index: number) => {
@@ -90,7 +95,24 @@ const Carousel: React.FC<CarouselProps> = ({ overlay, children }) => {
     }
   };
 
-  const { style, onTouchEnd, onTouchStart } = useSwipe(handleSwipe);
+  const { swipeStyle, onTouchEnd, onTouchStart } = useSwipe(handleSwipe);
+
+  const animatePosition = (index: number) => {
+    // Center card
+    if (index === currentIndex) {
+      return 'translate-x-0 scale-110 opacity-100';
+    }
+
+    // Cards to the left of current card
+    if (index < currentIndex) {
+      return 'translate-x-[65%] scale-75 '; // Move to left
+    }
+
+    // Cards to the right of current card
+    if (index > currentIndex) {
+      return '-translate-x-[65%] scale-75 '; // Move to right
+    }
+  };
 
   return (
     <div className="flex h-full flex-col px-14 overflow-hidden">
@@ -105,25 +127,34 @@ const Carousel: React.FC<CarouselProps> = ({ overlay, children }) => {
         </div>
 
         <div className="flex items-center justify-center flex-grow">
-          {children.map((card, index) => {
-            return (
-              <div
-                key={index}
-                style={{
-                  zIndex: calculateZIndex(index),
-                  ...style,
-                }}
-                className={`absolute 
-              flex items-center justify-center transition-transform duration-300 ease-linear
-              ${animatePosition(index)}`}
-                onTouchStart={onTouchStart}
-                onTouchEnd={onTouchEnd}
-              >
-                {card}
-                {overlay && generateOverlay(currentIndex, index)}
-              </div>
-            );
-          })}
+          {loading
+            ? // Render skeletons if loading
+              [...Array(4)].map((_, skeletonIndex) => (
+                <CardWrapper className={`${animatePosition(skeletonIndex)}`}>
+                  <Skeleton
+                    key={skeletonIndex}
+                    className="h-40 w-40 md:h-80 md:w-80 rounded-[1rem]"
+                  />
+                </CardWrapper>
+              ))
+            : // Render cards when not loading
+              children.map((card, index) => (
+                <CardWrapper
+                  key={index}
+                  index={index}
+                  currentIndex={currentIndex}
+                  style={{
+                    zIndex: calculateZIndex(index),
+                    ...swipeStyle,
+                  }}
+                  onTouchStart={onTouchStart}
+                  onTouchEnd={onTouchEnd}
+                  className={`${animatePosition(index)}`}
+                >
+                  {card}
+                  {generateOverlay(currentIndex, index)}
+                </CardWrapper>
+              ))}
         </div>
 
         <div className="flex-shrink-0">
