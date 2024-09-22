@@ -1,7 +1,8 @@
 import useSwipe from '@/hooks/useSwipe';
 import React, { useState } from 'react';
 
-interface CardProps {
+interface CarouselProps {
+  overlay: boolean;
   children: React.ReactNode[];
 }
 
@@ -37,7 +38,7 @@ const generateOverlay = (currentIndex: number, index: number) => {
   }
 };
 
-const Carousel: React.FC<CardProps> = ({ children }) => {
+const Carousel: React.FC<CarouselProps> = ({ overlay, children }) => {
   const [currentIndex, setCurrentIndex] = useState<number>(2);
 
   const prevSlide = (): void => {
@@ -92,7 +93,7 @@ const Carousel: React.FC<CardProps> = ({ children }) => {
   const { style, onTouchEnd, onTouchStart } = useSwipe(handleSwipe);
 
   return (
-    <div className="flex h-full flex-col px-[3.5rem] overflow-hidden">
+    <div className="flex h-full flex-col px-14 overflow-hidden">
       <div className="relative w-full h-full flex items-center">
         <div className="flex-shrink-0">
           <button
@@ -119,7 +120,7 @@ const Carousel: React.FC<CardProps> = ({ children }) => {
                 onTouchEnd={onTouchEnd}
               >
                 {card}
-                {generateOverlay(currentIndex, index)}
+                {overlay && generateOverlay(currentIndex, index)}
               </div>
             );
           })}
@@ -135,7 +136,7 @@ const Carousel: React.FC<CardProps> = ({ children }) => {
         </div>
       </div>
 
-      <div className="flex justify-around sm:hidden touch-hidden">
+      <div className="flex justify-around lg:hidden touch-hidden">
         <button onClick={prevSlide} className="p-2 text-jet hover:text-tangelo text-3xl">
           ◀
         </button>

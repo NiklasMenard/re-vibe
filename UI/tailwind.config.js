@@ -49,11 +49,11 @@ module.exports = {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			},
-			  tangelo: 'rgb(241, 86, 32)',
-			  vanilla: 'rgb(255, 236, 174)',
-			  jet: 'rgb(51, 51, 51)',
-			  coral: 'rgb(255, 130, 84)',
-			  viridian: 'rgb(85, 145, 127)',
+  			tangelo: 'rgb(241, 86, 32)',
+  			vanilla: 'rgb(255, 236, 174)',
+  			jet: 'rgb(51, 51, 51)',
+  			coral: 'rgb(255, 130, 84)',
+  			viridian: 'rgb(85, 145, 127)'
   		}
   	}
   },
