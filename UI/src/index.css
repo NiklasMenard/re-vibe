@@ -3,15 +3,24 @@
 @tailwind utilities;
 
 @layer base {
+
+
+  :root {
+    --tangelo: rgb(241, 86, 32);
+    --vanilla: rgb(255, 236, 174);
+    --jet: rgb(51, 51, 51);
+    --coral: rgb(255, 130, 84);
+    --viridian: rgb(85, 145, 127);
+  }
+
   html, body {
     height: 100%;
     margin: 0;
     padding: 0;
   }
 
-
   body {
-    background-color: #ffecae !important;
+
     height: 100%;
     font-family: 'Roboto', sans-serif;
     line-height: 1.5;
@@ -20,10 +29,11 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
 
-    #root {
-      height: 100% !important;
-    }
+  #root {
+    height: 100%; 
+    background-color: var(--vanilla) !important;
   }
 
   ul {
@@ -39,12 +49,8 @@
   h5 { font-size: 0.83rem; }
   h6 { font-size: 0.67rem; }
 
-  img, video, canvas {
-    height: auto;
-  }
-
   h1, h2, h3, h4, p, a, span, li {
-    color: black;
+    color: var(--jet);
     letter-spacing: 0.1em;
   }
 

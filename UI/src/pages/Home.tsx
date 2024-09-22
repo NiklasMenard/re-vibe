@@ -9,27 +9,24 @@ const Home = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <div className="flex-grow grid grid-cols-1 grid-rows-4  pt-28 md:grid-cols-2 md:grid-rows-2">
-        <div className="flex flex-col justify-center  bg-yellow-100 border-b border-gray-300 h-full p-[1rem]">
+      <div className="flex-grow grid grid-cols-1 grid-rows-4  py-28 md:grid-cols-2 md:grid-rows-2">
+        <div className="flex flex-col justify-center  bg-vanilla h-full p-[0.5rem] outline outline-jet outline-1">
           <h1 className="text-3xl font-bold mb-4">Medium length hero heading goes here</h1>
           <p className="text-lg mb-4">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros
             elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut
             commodo diam libero vitae erat.
           </p>
-          <Button
-            onClick={() => navigate('/products')}
-            className="bg-jet text-white hover:bg-coral w-full lg:w-[25rem]"
-          >
+          <Button onClick={() => navigate('/products')} className="w-full lg:w-[25rem]">
             Explore
           </Button>
         </div>
-        <div className="bg-gray-200 min-h-[15rem] h-full">
+        <div className="bg-gray-200 min-h-[15rem] h-full outline outline-jet outline-1">
           {/* Will add image here */}
           <p>pictures</p>
         </div>
 
-        <div className="flex flex-col justify-center p-10 bg-orange-100 border-b border-gray-300 h-full">
+        <div className="flex flex-col justify-center bg-coral border-b h-full p-[0.5rem] outline outline-jet outline-1">
           <h2 className="text-2xl font-semibold mb-4">
             Discover the Easiest Way to Buy and Sell Products Online
           </h2>
@@ -39,7 +36,7 @@ const Home = () => {
             to provide a user-friendly marketplace for all your needs.
           </p>
         </div>
-        <div className="bg-gray-200 min-h-[15rem] h-full">
+        <div className="bg-gray-200 min-h-[15rem] h-full  outline outline-jet outline-1">
           {/* Will add image here */}
           <p>pictures</p>
         </div>
