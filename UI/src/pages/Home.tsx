@@ -10,7 +10,7 @@ const Home = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <div className="flex-grow grid grid-cols-1 grid-rows-4  py-28 md:grid-cols-2 md:grid-rows-2">
-        <div className="flex flex-col justify-center  bg-vanilla h-full p-[0.5rem] outline outline-jet outline-1">
+        <div className="flex flex-col justify-center  bg-vanilla h-full px-10 outline outline-jet outline-1">
           <h1 className="text-3xl font-bold mb-4">Medium length hero heading goes here</h1>
           <p className="text-lg mb-4">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros
@@ -26,7 +26,7 @@ const Home = () => {
           <p>pictures</p>
         </div>
 
-        <div className="flex flex-col justify-center bg-coral border-b h-full p-[0.5rem] outline outline-jet outline-1">
+        <div className="flex flex-col justify-center  bg-coral border-b h-full px-10 outline outline-jet outline-1">
           <h2 className="text-2xl font-semibold mb-4">
             Discover the Easiest Way to Buy and Sell Products Online
           </h2>

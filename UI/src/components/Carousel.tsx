@@ -135,7 +135,7 @@ const Carousel: React.FC<CardProps> = ({ children }) => {
         </div>
       </div>
 
-      <div className="flex justify-around sm:hidden">
+      <div className="flex justify-around sm:hidden touch-hidden">
         <button onClick={prevSlide} className="p-2 text-jet hover:text-tangelo text-3xl">
           ◀
         </button>

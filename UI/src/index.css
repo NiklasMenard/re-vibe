@@ -2,81 +2,92 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@media (pointer: coarse) and (hover: none) {
+  .touch-hidden {
+    display: none;
+  }
+}
+
+
+
+
+:root {
+  --tangelo: rgb(241, 86, 32);
+  --vanilla: rgb(255, 236, 174);
+  --jet: rgb(51, 51, 51);
+  --coral: rgb(255, 130, 84);
+  --viridian: rgb(85, 145, 127);
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%; 
+  background-color: var(--vanilla) !important;
+}
+
+ul {
+  padding: 0;
+  list-style-type: none;
+  margin: 0;
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.17rem; }
+h4 { font-size: 1.00rem; }
+h5 { font-size: 0.83rem; }
+h6 { font-size: 0.67rem; }
+
+h1, h2, h3, h4, p, a, span, li {
+  color: var(--jet);
+  letter-spacing: 0.1em;
+}
+
+h1, h2, h3 {
+  line-height: 1.3;
+}
+
+span, p {
+  line-height: 1.75;
+}
+
+img {
+  border-style: none;
+}
+
+h1 {
+  font-size: clamp(1.2rem, -0.875rem + 8.333vw, 2.1rem);
+}
+
+h2, h3, a, li {
+  font-size: clamp(1.2rem, -0.875rem + 8.333vw, 1.5rem);
+}
+
+p {
+  font-size: clamp(1rem, -0.875rem + 1rem, 1.5rem);
+}
+
+
 @layer base {
 
-
-  :root {
-    --tangelo: rgb(241, 86, 32);
-    --vanilla: rgb(255, 236, 174);
-    --jet: rgb(51, 51, 51);
-    --coral: rgb(255, 130, 84);
-    --viridian: rgb(85, 145, 127);
-  }
-
-  html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-
-    height: 100%;
-    font-family: 'Roboto', sans-serif;
-    line-height: 1.5;
-    font-weight: 400;
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  #root {
-    height: 100%; 
-    background-color: var(--vanilla) !important;
-  }
-
-  ul {
-    padding: 0;
-    list-style-type: none;
-    margin: 0;
-  }
-
-  h1 { font-size: 2rem; }
-  h2 { font-size: 1.5rem; }
-  h3 { font-size: 1.17rem; }
-  h4 { font-size: 1.00rem; }
-  h5 { font-size: 0.83rem; }
-  h6 { font-size: 0.67rem; }
-
-  h1, h2, h3, h4, p, a, span, li {
-    color: var(--jet);
-    letter-spacing: 0.1em;
-  }
-
-  h1, h2, h3 {
-    line-height: 1.3;
-  }
-
-  span, p {
-    line-height: 1.75;
-  }
-
-  img {
-    border-style: none;
-  }
-
-  h1 {
-    font-size: clamp(1.2rem, -0.875rem + 8.333vw, 2.1rem);
-  }
-
-  h2, h3, a, li {
-    font-size: clamp(1.2rem, -0.875rem + 8.333vw, 1.5rem);
-  }
-
-  p {
-    font-size: clamp(1rem, -0.875rem + 1rem, 1.5rem);
-  }
 }
 
 @layer base {
