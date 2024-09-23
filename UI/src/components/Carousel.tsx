@@ -3,14 +3,15 @@ import React, { useState } from 'react';
 import { Skeleton } from './Skeleton';
 
 interface CarouselProps {
-  loading: boolean;
+  loading?: boolean;
+  renderOverlays?: boolean;
   children: React.ReactNode[];
 }
 
 const LeftToRightOverlay = () => {
   return (
     <div
-      className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-r from-black/5 to-black/70"
+      className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-r from-black/5 to-black/70 rounded-[1rem]"
       aria-hidden="true"
     ></div>
   );
@@ -19,7 +20,7 @@ const LeftToRightOverlay = () => {
 const RightToLeftOverlay = () => {
   return (
     <div
-      className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-l from-black/10 to-black/70"
+      className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-l from-black/10 to-black/70 rounded-[1rem]"
       aria-hidden="true"
     ></div>
   );
@@ -60,7 +61,7 @@ const CardWrapper: React.FC<CardWrapperProps> = ({ children, className, ...props
   );
 };
 
-const Carousel: React.FC<CarouselProps> = ({ loading, children }) => {
+const Carousel: React.FC<CarouselProps> = ({ loading, renderOverlays, children }) => {
   const [currentIndex, setCurrentIndex] = useState<number>(2);
 
   const prevSlide = (): void => {
@@ -115,65 +116,53 @@ const Carousel: React.FC<CarouselProps> = ({ loading, children }) => {
   };
 
   return (
-    <div className="flex h-full flex-col px-14 overflow-hidden">
-      <div className="relative w-full h-full flex items-center">
-        <div className="flex-shrink-0">
-          <button
-            onClick={prevSlide}
-            className="p-2 text-jet hover:text-tangelo text-3xl hidden sm:block"
-          >
-            ◀
-          </button>
-        </div>
+    <div className="h-[60svh]">
+      <div className="flex h-full flex-col px-14 overflow-hidden">
+        <div className="relative w-full h-full flex items-center">
+          <div className="flex flex-col h-full justify-end lg:justify-center mb-[-1rem] lg:mb-0">
+            <button
+              onClick={prevSlide}
+              className="p-2 text-jet hover:text-tangelo text-3xl touch-hidden"
+            >
+              ◀
+            </button>
+          </div>
 
-        <div className="flex items-center justify-center flex-grow">
-          {loading
-            ? // Render skeletons if loading
-              [...Array(4)].map((_, skeletonIndex) => (
-                <CardWrapper className={`${animatePosition(skeletonIndex)}`}>
-                  <Skeleton
-                    key={skeletonIndex}
-                    className="h-40 w-40 md:h-80 md:w-80 rounded-[1rem]"
-                  />
-                </CardWrapper>
-              ))
-            : // Render cards when not loading
-              children.map((card, index) => (
-                <CardWrapper
-                  key={index}
-                  index={index}
-                  currentIndex={currentIndex}
-                  style={{
-                    zIndex: calculateZIndex(index),
-                    ...swipeStyle,
-                  }}
-                  onTouchStart={onTouchStart}
-                  onTouchEnd={onTouchEnd}
-                  className={`${animatePosition(index)}`}
-                >
-                  {card}
-                  {generateOverlay(currentIndex, index)}
-                </CardWrapper>
-              ))}
-        </div>
+          <div className="flex items-center justify-center flex-grow">
+            {loading
+              ? // Render skeletons if loading
+                [...Array(4)].map((_, index) => (
+                  <CardWrapper key={index} className={`${animatePosition(index)}`}>
+                    <Skeleton className="h-80 w-64 md:h-[40rem] md:w-[40rem] rounded-[1rem]" />
+                  </CardWrapper>
+                ))
+              : // Render cards when not loading
+                children.map((card, index) => (
+                  <CardWrapper
+                    key={index}
+                    style={{
+                      zIndex: calculateZIndex(index),
+                      ...swipeStyle,
+                    }}
+                    onTouchStart={onTouchStart}
+                    onTouchEnd={onTouchEnd}
+                    className={`${animatePosition(index)}`}
+                  >
+                    {card}
+                    {renderOverlays && generateOverlay(currentIndex, index)}
+                  </CardWrapper>
+                ))}
+          </div>
 
-        <div className="flex-shrink-0">
-          <button
-            onClick={nextSlide}
-            className="p-2 text-jet hover:text-tangelo text-3xl hidden sm:block"
-          >
-            ▶
-          </button>
+          <div className="flex flex-col h-full justify-end lg:justify-center mb-[-1rem] lg:mb-0">
+            <button
+              onClick={nextSlide}
+              className="p-2 text-jet hover:text-tangelo text-3xl touch-hidden"
+            >
+              ▶
+            </button>
+          </div>
         </div>
-      </div>
-
-      <div className="flex justify-around lg:hidden touch-hidden">
-        <button onClick={prevSlide} className="p-2 text-jet hover:text-tangelo text-3xl">
-          ◀
-        </button>
-        <button onClick={nextSlide} className="p-2 text-jet hover:text-tangelo text-3xl">
-          ▶
-        </button>
       </div>
     </div>
   );
