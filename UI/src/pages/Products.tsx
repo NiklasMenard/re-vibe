@@ -37,12 +37,13 @@ const Products = () => {
             {products.map((product) => (
               <Card
                 key={product.product_id}
-                className={`rounded-[1rem] border border-jet transition-opacity duration-300 ${
-                  allImagesLoaded ? 'opacity-100' : 'opacity-0'
-                }`}
+                className={`rounded-[1rem] overflow-hidden border border-jet 
+                  transition-opacity duration-300  ${
+                    allImagesLoaded ? 'opacity-100' : 'opacity-0'
+                  }`}
                 style={{ pointerEvents: allImagesLoaded ? 'auto' : 'none' }} // Prevent interaction until loaded
               >
-                <CardHeader>
+                <CardHeader className="p-4">
                   <CardTitle>{product.name}</CardTitle>
                   <CardDescription className="overflow-hidden whitespace-nowrap text-ellipsis max-w-prose">
                     {product.description}
