@@ -37,21 +37,23 @@ const Products = () => {
             {products.map((product) => (
               <Card
                 key={product.product_id}
-                className={`rounded-[1rem] transition-opacity duration-300 ${
+                className={`rounded-[1rem] border border-jet transition-opacity duration-300 ${
                   allImagesLoaded ? 'opacity-100' : 'opacity-0'
                 }`}
                 style={{ pointerEvents: allImagesLoaded ? 'auto' : 'none' }} // Prevent interaction until loaded
               >
                 <CardHeader>
                   <CardTitle>{product.name}</CardTitle>
-                  <CardDescription>{product.description}</CardDescription>
+                  <CardDescription className="overflow-hidden whitespace-nowrap text-ellipsis max-w-prose">
+                    {product.description}
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="flex items-center justify-center">
+                <CardContent className="flex items-center justify-center pt-0">
                   <img
                     src={product.bucket_key}
                     alt={product.name}
                     onLoad={() => handleImageLoad(product.product_id)}
-                    className="max-w-full h-auto object-contain"
+                    className="max-w-full h-auto object-contain border-2 border-jet"
                   />
                 </CardContent>
               </Card>

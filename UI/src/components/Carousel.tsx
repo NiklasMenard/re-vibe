@@ -1,6 +1,7 @@
 import useSwipe from '@/hooks/useSwipe';
 import React, { useState } from 'react';
 import { Skeleton } from './Skeleton';
+import { ArrowButton } from './Buttons';
 
 interface CarouselProps {
   loading?: boolean;
@@ -119,13 +120,8 @@ const Carousel: React.FC<CarouselProps> = ({ loading, renderOverlays, children }
     <div className="h-[60svh]">
       <div className="flex h-full flex-col px-14 overflow-hidden">
         <div className="relative w-full h-full flex items-center">
-          <div className="flex flex-col h-full justify-end lg:justify-center mb-[-1rem] lg:mb-0">
-            <button
-              onClick={prevSlide}
-              className="p-2 text-jet hover:text-tangelo text-3xl touch-hidden"
-            >
-              ◀
-            </button>
+          <div className="flex flex-col h-full justify-end lg:justify-center ">
+            <ArrowButton onClick={prevSlide} direction="left" className="touch-hidden" />
           </div>
 
           <div className="flex items-center justify-center flex-grow">
@@ -154,13 +150,8 @@ const Carousel: React.FC<CarouselProps> = ({ loading, renderOverlays, children }
                 ))}
           </div>
 
-          <div className="flex flex-col h-full justify-end lg:justify-center mb-[-1rem] lg:mb-0">
-            <button
-              onClick={nextSlide}
-              className="p-2 text-jet hover:text-tangelo text-3xl touch-hidden"
-            >
-              ▶
-            </button>
+          <div className="flex flex-col h-full justify-end lg:justify-center">
+            <ArrowButton onClick={nextSlide} className="touch-hidden" />
           </div>
         </div>
       </div>

@@ -47,5 +47,42 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = 'Button';
 
+interface ArrowButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  direction?: 'left' | 'right';
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
+}
+
+const ArrowButton: React.FC<ArrowButtonProps> = ({ direction = 'right', className, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`p-3 rounded-full bg-jet text-white hover:bg-tangelo hover:shadow-lg 
+        transition-all duration-300 ease-in-out flex items-center justify-center ${className}`}
+    >
+      {direction === 'right' ? (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          className="w-6 h-6"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+        </svg>
+      ) : (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          className="w-6 h-6"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      )}
+    </button>
+  );
+};
+
 // eslint-disable-next-line react-refresh/only-export-components
-export { Button, buttonVariants };
+export { Button, buttonVariants, ArrowButton };
