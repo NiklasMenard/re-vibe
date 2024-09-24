@@ -1,10 +1,9 @@
 import useSwipe from '@/hooks/useSwipe';
 import React, { useState } from 'react';
-import { Skeleton } from './Skeleton';
+
 import { ArrowButton } from './Buttons';
 
 interface CarouselProps {
-  loading?: boolean;
   renderOverlays?: boolean;
   children: React.ReactNode[];
 }
@@ -62,7 +61,7 @@ const CardWrapper: React.FC<CardWrapperProps> = ({ children, className, ...props
   );
 };
 
-const Carousel: React.FC<CarouselProps> = ({ loading, renderOverlays, children }) => {
+const Carousel: React.FC<CarouselProps> = ({ renderOverlays, children }) => {
   const [currentIndex, setCurrentIndex] = useState<number>(2);
 
   const prevSlide = (): void => {
@@ -117,7 +116,7 @@ const Carousel: React.FC<CarouselProps> = ({ loading, renderOverlays, children }
   };
 
   return (
-    <div className="h-[60svh]">
+    <div className="h-[60dvh]">
       <div className="flex h-full flex-col px-14 overflow-hidden">
         <div className="relative w-full h-full flex items-center">
           <div className="flex flex-col h-full justify-end lg:justify-center ">
@@ -125,29 +124,24 @@ const Carousel: React.FC<CarouselProps> = ({ loading, renderOverlays, children }
           </div>
 
           <div className="flex items-center justify-center flex-grow">
-            {loading
-              ? // Render skeletons if loading
-                [...Array(4)].map((_, index) => (
-                  <CardWrapper key={index} className={`${animatePosition(index)}`}>
-                    <Skeleton className="h-80 w-64 md:h-[40rem] md:w-[40rem] rounded-[1rem]" />
-                  </CardWrapper>
-                ))
-              : // Render cards when not loading
-                children.map((card, index) => (
-                  <CardWrapper
-                    key={index}
-                    style={{
-                      zIndex: calculateZIndex(index),
-                      ...swipeStyle,
-                    }}
-                    onTouchStart={onTouchStart}
-                    onTouchEnd={onTouchEnd}
-                    className={`${animatePosition(index)}`}
-                  >
-                    {card}
-                    {renderOverlays && generateOverlay(currentIndex, index)}
-                  </CardWrapper>
-                ))}
+            {
+              // Render cards when not loading
+              children.map((card, index) => (
+                <CardWrapper
+                  key={index}
+                  style={{
+                    zIndex: calculateZIndex(index),
+                    ...swipeStyle,
+                  }}
+                  onTouchStart={onTouchStart}
+                  onTouchEnd={onTouchEnd}
+                  className={`${animatePosition(index)}`}
+                >
+                  {card}
+                  {renderOverlays && generateOverlay(currentIndex, index)}
+                </CardWrapper>
+              ))
+            }
           </div>
 
           <div className="flex flex-col h-full justify-end lg:justify-center">

@@ -33,7 +33,7 @@ const Products = () => {
         {!loading && !error && products.length === 0 && data && <p>No products found</p>}
 
         {!error && (
-          <Carousel loading={loading} renderOverlays={!loading && allImagesLoaded}>
+          <Carousel renderOverlays={!loading && allImagesLoaded}>
             {products.map((product) => (
               <Card
                 key={product.product_id}
