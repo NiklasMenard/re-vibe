@@ -9,7 +9,24 @@
   }
 }
 
+@keyframes scrollImages {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
 
+.image-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.image-wrapper {
+  animation: scrollImages 20s linear infinite;
+}
 
 
 :root {
@@ -27,7 +44,6 @@ html, body {
 }
 
 body {
-
   height: 100%;
   font-family: 'Roboto', sans-serif;
   line-height: 1.5;
@@ -49,13 +65,6 @@ ul {
   margin: 0;
 }
 
-h1 { font-size: 2rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.17rem; }
-h4 { font-size: 1.00rem; }
-h5 { font-size: 0.83rem; }
-h6 { font-size: 0.67rem; }
-
 h1, h2, h3, h4, p, a, span, li {
   color: var(--jet);
   letter-spacing: 0.1em;
@@ -70,7 +79,13 @@ span, p {
 }
 
 img {
+  display: block;
+  max-width: 100%;
   border-style: none;
+}
+
+img, video, canvas {
+  height: auto;
 }
 
 h1 {
@@ -78,11 +93,11 @@ h1 {
 }
 
 h2, h3, a, li {
-  font-size: clamp(1.2rem, -0.875rem + 8.333vw, 1.5rem);
+  font-size: clamp(1.3rem, -0.875rem + 8.333vw, 2rem);
 }
 
 p {
-  font-size: clamp(1rem, -0.875rem + 1rem, 1.5rem);
+  font-size: clamp(1.2rem, -0.875rem + 1rem, 1.5rem);
 }
 
 

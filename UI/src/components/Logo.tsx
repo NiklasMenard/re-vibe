@@ -4,7 +4,7 @@ const Logo = () => {
   const navigate = useNavigate();
   return (
     <svg
-      className="h-[5rem] w-[5rem] cursor-pointer my-auto"
+      className="cursor-pointer my-auto px-1 md:p-0"
       onClick={() => navigate('/')}
       width="79"
       height="41"

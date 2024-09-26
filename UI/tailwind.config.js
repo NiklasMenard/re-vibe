@@ -8,6 +8,11 @@ module.exports = {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
+		  screens: {
+			'fullhd': '1920px', // Full HD resolution (1080p)
+			'2k': '2560px',     // 2K resolution (WQHD)
+			'4k': '3840px',     // 4K resolution (UHD)
+		  },
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
