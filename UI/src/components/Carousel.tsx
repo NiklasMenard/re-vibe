@@ -116,7 +116,7 @@ const Carousel: React.FC<CarouselProps> = ({ renderOverlays, children }) => {
   };
 
   return (
-    <div className="h-[60dvh]">
+    <div className="h-[60dvh] fullhd:h-[70dvh] my-auto w-full">
       <div className="flex h-full flex-col px-14 overflow-hidden">
         <div className="relative w-full h-full flex items-center">
           <div className="flex flex-col h-full justify-end lg:justify-center ">

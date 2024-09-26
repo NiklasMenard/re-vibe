@@ -23,11 +23,9 @@ const Products = () => {
   const allImagesLoaded = products.length > 0 && loadedImages.size === products.length;
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-[100dvh] overflow-auto">
       <Header />
-      <div className="flex-grow py-20 pb-2">
-        <h1 className="text-center pt-8">Products</h1>
-
+      <div className="flex flex-grow pt-[4rem]">
         {!loading && error && <p>Error: {error}</p>}
 
         {!loading && !error && products.length === 0 && data && <p>No products found</p>}
