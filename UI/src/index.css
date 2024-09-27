@@ -24,11 +24,6 @@
   justify-content: flex-start;
 }
 
-.image-wrapper {
-  animation: scrollImages 20s linear infinite;
-}
-
-
 :root {
   --tangelo: rgb(241, 86, 32);
   --vanilla: rgb(255, 236, 174);

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ArrowButton } from './Buttons';
 
 interface CarouselProps {
+  renderCards?: boolean;
   renderOverlays?: boolean;
   children: React.ReactNode[];
 }
@@ -61,7 +62,11 @@ const CardWrapper: React.FC<CardWrapperProps> = ({ children, className, ...props
   );
 };
 
-const Carousel: React.FC<CarouselProps> = ({ renderOverlays, children }) => {
+const Carousel: React.FC<CarouselProps> = ({
+  renderCards = false,
+  renderOverlays = false,
+  children,
+}) => {
   const [currentIndex, setCurrentIndex] = useState<number>(2);
 
   const prevSlide = (): void => {
@@ -104,51 +109,49 @@ const Carousel: React.FC<CarouselProps> = ({ renderOverlays, children }) => {
       return 'translate-x-0 scale-110 opacity-100';
     }
 
-    // Cards to the left of current card
     if (index < currentIndex) {
       return 'translate-x-[65%] scale-75 '; // Move to left
     }
 
-    // Cards to the right of current card
     if (index > currentIndex) {
       return '-translate-x-[65%] scale-75 '; // Move to right
     }
   };
 
   return (
-    <div className="h-[60dvh] fullhd:h-[70dvh] my-auto w-full">
-      <div className="flex h-full flex-col px-14 overflow-hidden">
-        <div className="relative w-full h-full flex items-center">
-          <div className="flex flex-col h-full justify-end lg:justify-center ">
-            <ArrowButton onClick={prevSlide} direction="left" className="touch-hidden" />
-          </div>
-
-          <div className="flex items-center justify-center flex-grow">
-            {
-              // Render cards when not loading
-              children.map((card, index) => (
-                <CardWrapper
-                  key={index}
-                  style={{
-                    zIndex: calculateZIndex(index),
-                    ...swipeStyle,
-                  }}
-                  onTouchStart={onTouchStart}
-                  onTouchEnd={onTouchEnd}
-                  className={`${animatePosition(index)}`}
-                >
-                  {card}
-                  {renderOverlays && generateOverlay(currentIndex, index)}
-                </CardWrapper>
-              ))
-            }
-          </div>
-
-          <div className="flex flex-col h-full justify-end lg:justify-center">
-            <ArrowButton onClick={nextSlide} className="touch-hidden" />
-          </div>
+    <div className="flex justify-center items-center relative flex-1 px-10 min-h-[100dvh]">
+      <ArrowButton
+        onClick={prevSlide}
+        direction="left"
+        className="touch-hidden position absolute bottom-10 xl:bottom-[50%] left-10"
+      />
+      <div className="relative flex-grow flex items-center ">
+        <div className="flex items-center justify-center flex-1">
+          {!renderCards ? (
+            children.map((card, index) => (
+              <CardWrapper
+                key={index}
+                style={{
+                  zIndex: calculateZIndex(index),
+                  ...swipeStyle,
+                }}
+                onTouchStart={onTouchStart}
+                onTouchEnd={onTouchEnd}
+                className={`${animatePosition(index)}`}
+              >
+                {card}
+                {renderOverlays && generateOverlay(currentIndex, index)}
+              </CardWrapper>
+            ))
+          ) : (
+            <p>No products</p>
+          )}
         </div>
       </div>
+      <ArrowButton
+        onClick={nextSlide}
+        className="touch-hidden position absolute bottom-10  xl:bottom-[50%] right-10"
+      />
     </div>
   );
 };
