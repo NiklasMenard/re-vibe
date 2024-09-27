@@ -50,10 +50,12 @@ const ImageScroller: React.FC<ImageScrollerProps> = ({ imagePaths, className }) 
   }, []);
 
   return (
-    <div className={`image-wrapper ${className}`} ref={wrapperRef}>
-      {imagePaths.map((path, index) => (
-        <img key={index} src={path} alt={`Gallery image ${index + 1}`} className="p-2" />
-      ))}
+    <div className=" flex relative overflow-hidden flex-1">
+      <div className={`image-wrapper ${className}`} ref={wrapperRef}>
+        {imagePaths.map((path, index) => (
+          <img key={index} src={path} alt={`Gallery image ${index + 1}`} className="p-2" />
+        ))}
+      </div>
     </div>
   );
 };

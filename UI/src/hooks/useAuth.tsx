@@ -32,6 +32,14 @@ const defaultAuthContext: AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
+const decodeToken = (token: string) => {
+  if (token === '') {
+    return null;
+  }
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  return payload;
+};
+
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const navigate = useNavigate();
 
@@ -121,15 +129,15 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [token]);
 
   useEffect(() => {
-    const decodeToken = (token: string) => {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp;
-    };
-
     const checkToken = () => {
-      const exp = decodeToken(token ?? '');
+      const payload = decodeToken(token ?? '');
+
+      if (!payload) {
+        return;
+      }
+
       const now = Math.floor(Date.now() / 1000);
-      const timeToRefresh = exp - now - REFRESH_THRESHOLD;
+      const timeToRefresh = payload.exp - now - REFRESH_THRESHOLD;
 
       // Token is still valid
       if (timeToRefresh > 0) {

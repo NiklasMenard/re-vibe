@@ -46,20 +46,16 @@ const Home = () => {
           </div>
         </div>
 
-        <div
-          className="flex bg-vanilla justify-center
-            overflow-hidden 
-            max-h-[35rem] 
-            fullhd:max-h-[25.55rem] 
-            2k:max-h-[35.93rem]"
-        >
+        <div className="flex bg-vanilla justify-center">
           <ImageScroller
-            className="mt-[-8rem]"
+            className=" absolute mt-[-8rem] right-0"
             imagePaths={images_first_column.map(
               (path) => `${import.meta.env.BASE_URL}image_gallery/${path}`
             )}
           />
+
           <ImageScroller
+            className="absolute"
             imagePaths={images_second_column.map(
               (path) => `${import.meta.env.BASE_URL}image_gallery/${path}`
             )}

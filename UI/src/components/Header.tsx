@@ -1,13 +1,28 @@
+import { Link } from 'react-router-dom';
 import Logo from './Logo';
+import { Button } from './Buttons';
+import { useAuth } from '@/hooks/useAuth';
 
 const Header = () => {
+  const { isAuthenticated, logout } = useAuth();
+
   return (
     <div
-      className="fixed flex
+      className="fixed flex justify-between
       top-0 w-full z-50 bg-white border- b-gray-300 
       h-[4rem] px-4 outline outline-jet outline-1"
     >
       <Logo />
+
+      {isAuthenticated() ? (
+        <Button variant="default" className="my-auto" onClick={logout}>
+          Logout
+        </Button>
+      ) : (
+        <Button asChild variant="default" className="my-auto">
+          <Link to="/login">Login</Link>
+        </Button>
+      )}
     </div>
   );
 };
