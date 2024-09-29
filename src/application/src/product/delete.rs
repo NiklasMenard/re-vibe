@@ -1,54 +1,43 @@
 use diesel::prelude::*;
-use domain::models::Product;
+use domain::{models::Product, schema::products};
 use infrastructure::database::connection::establish_connection;
-use rocket::response::status::NotFound;
+use rocket::http::Status;
 use shared::response_models::{Response, ResponseBody};
 
-pub fn delete_product(id: i32) -> Result<Vec<Product>, NotFound<String>> {
-    use domain::schema::products;
-    use domain::schema::products::dsl::*;
-
-    let response: Response;
+pub async fn delete_product(id: i32) -> Result<String, Status> {
     let connect = &mut establish_connection();
 
-    let num_deleted = match diesel::delete(products.filter(product_id.eq(id))).execute(connect) {
+    let num_deleted = match diesel::delete(products::table.filter(products::product_id.eq(id)))
+        .execute(connect)
+    {
         Ok(count) => count,
         Err(err) => match err {
             diesel::result::Error::NotFound => {
-                let response = Response {
-                    body: ResponseBody::Message(format!(
-                        "Error publishing post with id {:?} - {:?}",
-                        product_id, err
-                    )),
-                };
-                return Err(NotFound(serde_json::to_string(&response).unwrap()));
+                return Err(Status::NotFound);
             }
             _ => {
-                panic!("Database error - {}", err);
+                eprintln!("Database error - {}", err);
+                return Err(Status::InternalServerError);
             }
         },
     };
 
     if num_deleted > 0 {
         match products::table
-            .select(products::all_columns)
-            .load::<Product>(&mut establish_connection())
+            .load::<Product>(connect) // Use the existing connection
         {
-            Ok(mut products_) => {
-                products_.sort();
-                Ok(products_)
+            Ok(products_) => {
+                let response = Response {
+                    body: ResponseBody::Message(format!("Successfully deleted product. {} products remaining.", products_.len())),
+                };
+                Ok(serde_json::to_string(&response).unwrap())
             }
-            // doesn't seem like selecting everything will throw any errors, leaving room for specific error handling just in case though
-            Err(err) => match err {
-                _ => {
-                    panic!("Database error - {}", err);
-                }
-            },
+            Err(err) => {
+                eprintln!("Database error - {}", err);
+                return Err(Status::InternalServerError);
+            }
         }
     } else {
-        response = Response {
-            body: ResponseBody::Message(format!("Error - no post with id {:?}", product_id)),
-        };
-        Err(NotFound(serde_json::to_string(&response).unwrap()))
+        Err(Status::NotFound)
     }
 }

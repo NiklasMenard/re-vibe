@@ -4,22 +4,19 @@ use infrastructure::{
     database::connection::establish_connection,
     s3_client::{create_client, generate_presigned_url},
 };
-use rocket::response::status::NotFound;
+use rocket::http::Status;
 use shared::response_models::{Response, ResponseBody};
 
-pub async fn list_products() -> Vec<Product> {
+pub async fn list_products() -> Result<String, Status> {
     let connect = &mut establish_connection();
 
-    // Fetch products from the database
-    let products = match products::table
+    let products = products::table
         .select(products::all_columns)
         .load::<Product>(connect)
-    {
-        Ok(products) => products,
-        Err(err) => {
-            panic!("Database error - {}", err);
-        }
-    };
+        .map_err(|err| {
+            eprintln!("Database error - {}", err);
+            Status::InternalServerError
+        })?;
 
     //Create S3 Client
     let client = create_client().await.unwrap();
@@ -53,26 +50,29 @@ pub async fn list_products() -> Vec<Product> {
 
     products_with_urls.sort_by(|a, b| a.name.cmp(&b.name));
 
-    products_with_urls
+    let response = Response {
+        body: ResponseBody::Products(products_with_urls),
+    };
+
+    Ok(serde_json::to_string(&response).unwrap())
 }
 
-pub fn list_product(post_id: i32) -> Result<Product, NotFound<String>> {
+pub async fn list_product(product_id: i32) -> Result<String, Status> {
     let connect = &mut establish_connection();
 
-    match products::table.find(post_id).first::<Product>(connect) {
-        Ok(post) => Ok(post),
+    match products::table.find(product_id).first::<Product>(connect) {
+        Ok(product) => {
+            let response = Response {
+                body: ResponseBody::Product(product),
+            };
+
+            Ok(serde_json::to_string(&response).unwrap())
+        }
         Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                let response = Response {
-                    body: ResponseBody::Message(format!(
-                        "Error selecting post with id {} - {}",
-                        post_id, err
-                    )),
-                };
-                return Err(NotFound(serde_json::to_string(&response).unwrap()));
-            }
+            diesel::result::Error::NotFound => Err(Status::NotFound),
             _ => {
-                panic!("Database error - {}", err);
+                eprintln!("Database error - {}", err);
+                Err(Status::InternalServerError)
             }
         },
     }

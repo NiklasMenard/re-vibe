@@ -3,32 +3,18 @@ use domain::models::NewProduct;
 use infrastructure::auth::UserApiKey;
 
 use rocket::http::Status;
-use rocket::response::status::Created;
 
 use rocket::serde::json::Json;
 use rocket::{delete, get, post, put};
-use shared::response_models::{Response, ResponseBody};
 
 #[get("/products")]
 pub async fn list_products_handler() -> Result<String, Status> {
-    let products = read::list_products().await;
-
-    let response = Response {
-        body: ResponseBody::Products(products),
-    };
-
-    Ok(serde_json::to_string(&response).unwrap())
+    read::list_products().await
 }
 
 #[get("/products/<product_id>")]
-pub fn list_product_handler(product_id: i32) -> Result<String, Status> {
-    let found_product = read::list_product(product_id).unwrap();
-
-    let response = Response {
-        body: ResponseBody::Product(found_product),
-    };
-
-    Ok(serde_json::to_string(&response).unwrap())
+pub async fn list_product_handler(product_id: i32) -> Result<String, Status> {
+    read::list_product(product_id).await
 }
 
 #[put(
@@ -36,35 +22,23 @@ pub fn list_product_handler(product_id: i32) -> Result<String, Status> {
     format = "application/json",
     data = "<product>"
 )]
-pub fn update_product_handler(
+pub async fn update_product_handler(
     _key: UserApiKey,
     product_id: i32,
     product: Json<NewProduct>,
 ) -> Result<String, Status> {
-    let product = update::update_product(product_id, product).unwrap();
-
-    let response = Response {
-        body: ResponseBody::Product(product),
-    };
-
-    Ok(serde_json::to_string(&response).unwrap())
+    update::update_product(product_id, product).await
 }
 
 #[post("/products", format = "application/json", data = "<product>")]
-pub fn create_product_handler(
+pub async fn create_product_handler(
     _key: UserApiKey,
     product: Json<NewProduct>,
-) -> Result<Created<String>, Status> {
-    Ok(create::post_product(product))
+) -> Result<String, Status> {
+    create::post_product(product).await
 }
 
 #[delete("/products/<id>")]
-pub fn delete_product_handler(_key: UserApiKey, id: i32) -> Result<String, Status> {
-    let products = delete::delete_product(id).unwrap();
-
-    let response = Response {
-        body: ResponseBody::Products(products),
-    };
-
-    Ok(serde_json::to_string(&response).unwrap())
+pub async fn delete_product_handler(_key: UserApiKey, id: i32) -> Result<String, Status> {
+    delete::delete_product(id).await
 }

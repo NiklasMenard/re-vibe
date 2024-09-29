@@ -1,10 +1,10 @@
 use diesel::prelude::*;
 use domain::models::{NewProduct, Product};
 use infrastructure::database::connection::establish_connection;
-use rocket::{response::status::NotFound, serde::json::Json};
+use rocket::{http::Status, serde::json::Json};
 use shared::response_models::{Response, ResponseBody};
 
-pub fn update_product(id: i32, new_product: Json<NewProduct>) -> Result<Product, NotFound<String>> {
+pub async fn update_product(id: i32, new_product: Json<NewProduct>) -> Result<String, Status> {
     use domain::schema::products::dsl::*;
 
     let product_update = new_product.into_inner();
@@ -20,19 +20,19 @@ pub fn update_product(id: i32, new_product: Json<NewProduct>) -> Result<Product,
         ))
         .get_result::<Product>(&mut establish_connection())
     {
-        Ok(product) => Ok(product),
+        Ok(product) => {
+            let response = Response {
+                body: ResponseBody::Product(product),
+            };
+
+            Ok(serde_json::to_string(&response).unwrap())
+        }
+
         Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                let response = Response {
-                    body: ResponseBody::Message(format!(
-                        "Error updating product with id {:?} - {:?}",
-                        product_id, err
-                    )),
-                };
-                return Err(NotFound(serde_json::to_string(&response).unwrap()));
-            }
+            diesel::result::Error::NotFound => Err(Status::NotFound),
             _ => {
-                panic!("Database error - {}", err);
+                eprintln!("Database error - {}", err);
+                Err(Status::InternalServerError)
             }
         },
     }

@@ -3,11 +3,11 @@ use diesel::{ExpressionMethods, RunQueryDsl};
 use domain::models::{NewProduct, Product};
 
 use infrastructure::database::connection::establish_connection;
-use rocket::response::status::Created;
+use rocket::http::Status;
 use rocket::serde::json::Json;
 use shared::response_models::{Response, ResponseBody};
 
-pub fn post_product(product: Json<NewProduct>) -> Created<String> {
+pub async fn post_product(product: Json<NewProduct>) -> Result<String, Status> {
     use domain::schema::products;
 
     let new_data = product.into_inner();
@@ -30,16 +30,15 @@ pub fn post_product(product: Json<NewProduct>) -> Created<String> {
         ))
         .get_result::<Product>(connection)
     {
-        Ok(product) => {
+        Ok(_) => {
             let response = Response {
-                body: ResponseBody::Product(product),
+                body: ResponseBody::Message("Product favorited successfully".to_string()),
             };
-            Created::new("").tagged_body(serde_json::to_string(&response).unwrap())
+            Ok(serde_json::to_string(&response).unwrap())
         }
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+        Err(err) => {
+            eprintln!("Database error - {}", err);
+            Err(Status::InternalServerError)
+        }
     }
 }
