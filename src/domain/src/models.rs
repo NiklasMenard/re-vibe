@@ -7,7 +7,7 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::schema::{products, user_roles, users};
+use crate::schema::{products, user_favorite_products, user_roles, users};
 
 // Struct for the Users table
 #[derive(Queryable, Serialize, Deserialize, Debug)]
@@ -133,4 +133,12 @@ pub struct Tag {
 pub struct ProductTag {
     pub product_id: i32,
     pub tag_id: i32,
+}
+
+#[derive(Insertable, Deserialize, Queryable)]
+#[diesel(table_name = user_favorite_products)]
+pub struct UserFavoriteProduct {
+    pub user_id: Uuid,
+    pub product_id: i32,
+    pub added_date: NaiveDateTime,
 }

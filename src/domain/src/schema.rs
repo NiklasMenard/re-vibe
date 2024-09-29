@@ -50,6 +50,14 @@ diesel::table! {
 }
 
 diesel::table! {
+    user_favorite_products (user_id, product_id) {
+        user_id -> Uuid,
+        product_id -> Int4,
+        added_date -> Timestamp,
+    }
+}
+
+diesel::table! {
     user_roles (user_id, role_id) {
         user_id -> Uuid,
         role_id -> Int4,
@@ -76,6 +84,8 @@ diesel::joinable!(product_tags -> products (product_id));
 diesel::joinable!(product_tags -> tags (tag_id));
 diesel::joinable!(products -> product_categories (category_id));
 diesel::joinable!(products -> users (seller_id));
+diesel::joinable!(user_favorite_products -> products (product_id));
+diesel::joinable!(user_favorite_products -> users (user_id));
 diesel::joinable!(user_roles -> roles (role_id));
 diesel::joinable!(user_roles -> users (user_id));
 
@@ -85,6 +95,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     products,
     roles,
     tags,
+    user_favorite_products,
     user_roles,
     users,
 );
