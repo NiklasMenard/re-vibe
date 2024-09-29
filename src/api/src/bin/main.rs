@@ -8,6 +8,7 @@ use rocket::{Request, Response};
 
 use api::auth_handler;
 use api::catcher_handler;
+use api::favorites_handler;
 use api::product_handler;
 use api::user_handler;
 
@@ -112,7 +113,10 @@ fn rocket() -> _ {
                 user_handler::register_user_handler,
                 user_handler::list_user_handler,
                 user_handler::update_user_handler,
-                user_handler::delete_user_handler
+                user_handler::delete_user_handler,
+                favorites_handler::get_favorited_products,
+                favorites_handler::add_favorite_product,
+                favorites_handler::delete_product_handler,
             ],
         )
         .mount(
