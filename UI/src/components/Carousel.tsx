@@ -119,7 +119,7 @@ const Carousel: React.FC<CarouselProps> = ({
   };
 
   return (
-    <div className="flex justify-center items-center relative flex-1 px-10 min-h-[100dvh]">
+    <div className="flex justify-center items-center relative flex-1 px-10 min-h-[85dvh]">
       <ArrowButton
         onClick={prevSlide}
         direction="left"
