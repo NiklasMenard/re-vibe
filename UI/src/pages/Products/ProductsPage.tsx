@@ -12,7 +12,7 @@ import FavoriteIcon from '@/components/FavoriteIcon';
 import { useAuth } from '@/hooks/useAuth';
 
 import FavoriteProductsContainer from './FavoriteProducts';
-import { dummmyProducts } from '@/assets/dummy';
+import { dummmyProducts } from '@/constants/dummy';
 
 const ProductsPage = () => {
   const [loadedImages, setLoadedImages] = useState(new Set());

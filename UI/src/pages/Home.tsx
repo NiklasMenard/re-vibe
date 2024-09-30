@@ -49,12 +49,16 @@ const Home = () => {
         <div className="flex bg-vanilla justify-center">
           <ImageScroller
             className=" absolute mt-[-8rem] right-0"
-            imagePaths={images_first_column.map((path) => `/src/assets/image_gallery/${path}`)}
+            imagePaths={images_first_column.map(
+              (path) => `${import.meta.env.BASE_URL}image_gallery/${path}`
+            )}
           />
 
           <ImageScroller
             className="absolute"
-            imagePaths={images_second_column.map((path) => `/src/assets/image_gallery/${path}`)}
+            imagePaths={images_second_column.map(
+              (path) => `${import.meta.env.BASE_URL}image_gallery/${path}`
+            )}
           />
         </div>
 
@@ -72,7 +76,7 @@ const Home = () => {
         </div>
         <div className="flex flex-col items-center  justify-center bg-vanilla md:bg-coral p-4 border-t lg:border-b border-t-jet">
           <img
-            src={`/src/assets/hero-image.jpg`}
+            src={`${import.meta.env.BASE_URL}hero-image.jpg`}
             alt="Hero image"
             className=" fullhd:max-h-[37vh]"
           />
