@@ -16,8 +16,9 @@ interface AuthContextType {
   logout: () => void;
   loading: boolean;
   error: string | null;
-  isAuthenticated: () => boolean;
+  isAuthenticated: boolean;
   refreshAuthToken: () => Promise<string | null>;
+  getUserId: () => string | null;
 }
 
 const defaultAuthContext: AuthContextType = {
@@ -26,24 +27,31 @@ const defaultAuthContext: AuthContextType = {
   logout: () => {},
   loading: false,
   error: null,
-  isAuthenticated: () => false,
+  isAuthenticated: false,
   refreshAuthToken: async () => null,
+  getUserId: () => null,
 };
 
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
-const decodeToken = (token: string) => {
-  if (token === '') {
+const decodeToken = (token: string | null) => {
+  if (!token) {
     return null;
   }
-  const payload = JSON.parse(atob(token.split('.')[1]));
-  return payload;
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload;
+  } catch (error) {
+    console.error('Failed to decode token:', error);
+    return null;
+  }
 };
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
@@ -84,6 +92,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   );
 
   const logout = useCallback(async () => {
+    setLoading(true);
+
     const response = await fetch(`${API_BASE_URL}/auth/logout`, {
       method: 'POST',
       credentials: 'include',
@@ -91,66 +101,97 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
     if (!response.ok) {
       const message = statusCodeMessages[response.status] || 'An unknown error occurred.';
-      logout();
+      setLoading(false);
       throw new Error(message);
     }
 
     setToken(null);
+    setLoading(false);
     navigate('/');
   }, [navigate]);
 
   const refreshAuthToken = useCallback(async () => {
-    // Token is expired, check refresh token
-    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
-      method: 'POST',
-      credentials: 'include',
-    });
+    try {
+      setLoading(true);
 
-    if (!response.ok) {
-      const message = statusCodeMessages[response.status] || 'An unknown error occurred.';
-      logout();
-      throw new Error(message);
+      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const message = statusCodeMessages[response.status] || 'An unknown error occurred.';
+        throw new Error(message);
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.access_token) {
+        setToken(data.access_token);
+        return data.access_token;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      return null;
+    } finally {
+      setLoading(false);
     }
+  }, []);
 
-    const data = await response.json();
+  const isAuthenticated = !!token;
 
-    if (data.success && data.access_token) {
-      setToken(data.access_token);
-      return data.access_token;
-    } else {
-      // Refresh token is expired or invalid
-      logout();
+  const getUserId = useCallback(() => {
+    if (!isAuthenticated) {
       return null;
     }
-  }, [logout]);
 
-  const isAuthenticated = useCallback(() => {
-    return !!token;
-  }, [token]);
+    return decodeToken(token).sub;
+  }, [isAuthenticated, token]);
 
   useEffect(() => {
-    const checkToken = () => {
-      const payload = decodeToken(token ?? '');
+    if (!token) {
+      refreshAuthToken();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const checkToken = async () => {
+      if (loading) {
+        return;
+      }
+
+      const payload = decodeToken(token);
 
       if (!payload) {
-        return;
+        return; // Token is not valid, no further checks
       }
 
       const now = Math.floor(Date.now() / 1000);
-      const timeToRefresh = payload.exp - now - REFRESH_THRESHOLD;
+      const timeToExpire = payload.exp - now;
 
-      // Token is still valid
-      if (timeToRefresh > 0) {
-        return;
+      // Check if we are within the refresh threshold
+      if (timeToExpire > REFRESH_THRESHOLD) {
+        return; // Token is still valid, no need to refresh
       }
 
-      refreshAuthToken();
+      // If the token is under the threshold, either refresh or logout
+      if (timeToExpire > 0) {
+        // Token is within the threshold, attempt to refresh
+        await refreshAuthToken();
+      } else {
+        // Token is expired, log the user out
+        logout();
+      }
     };
 
     if (token) {
       checkToken();
     }
-  }, [token, refreshAuthToken, logout]);
+  }, [token, loading, refreshAuthToken, logout]);
 
   const value: AuthContextType = {
     token,
@@ -160,6 +201,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     error,
     isAuthenticated,
     refreshAuthToken,
+    getUserId,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
