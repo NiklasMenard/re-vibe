@@ -54,7 +54,7 @@ const useRequest = <T,>(options: RequestOptions = {}): UseRequestResponse<T> => 
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const fetchUrl = mergedOptions.url ? mergedOptions.url : requestUrl;
+        const fetchUrl = requestUrl ? requestUrl : mergedOptions.url;
 
         if (!fetchUrl) {
           throw new Error('No URL provided');

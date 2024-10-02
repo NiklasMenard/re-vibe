@@ -46,7 +46,7 @@ const ProductsPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-[100dvh] overflow-y-auto overflow-x-hidden">
+    <div className="flex flex-col min-h-[100vh] overflow-y-auto overflow-x-hidden">
       <Header />
       <Carousel renderCards={loadedAndNoErrorState} renderOverlays={!loading && allImagesLoaded}>
         {products.map((product) => (

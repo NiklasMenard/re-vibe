@@ -26,6 +26,8 @@ const LoginPage = () => {
         {error && <div className="text-red-500 mb-4">{error}</div>}
         <form onSubmit={handleSubmit} className="w-full">
           <div className="mb-10">
+            <p>Username: test-user </p>
+            <p className="mb-10">Password: password</p>
             <Label htmlFor="email">Username:</Label>
             <Input
               type="text"

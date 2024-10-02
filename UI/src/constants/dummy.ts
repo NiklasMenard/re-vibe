@@ -10,7 +10,7 @@ export const dummmyProducts: Product[] = [
       seller_id: 'user_12345',
       category_id: 1,
       creation_date: '2024-09-27',
-      bucket_key: `/src/assets/image_gallery/dress_62_0.jpg`,
+      bucket_key: `${import.meta.env.BASE_URL}image_gallery/dress_62_0.jpg`,
     },
     {
       product_id: 2,
@@ -21,7 +21,7 @@ export const dummmyProducts: Product[] = [
       seller_id: 'user_54321',
       category_id: 2,
       creation_date: '2024-09-26',
-      bucket_key: `/src/assets/image_gallery/dress_62_0.jpg`,
+      bucket_key: `${import.meta.env.BASE_URL}image_gallery/dress_62_0.jpg`,
     },
     {
       product_id: 3,
@@ -32,7 +32,7 @@ export const dummmyProducts: Product[] = [
       seller_id: 'user_67890',
       category_id: 3,
       creation_date: '2024-09-25',
-      bucket_key: `/src/assets/image_gallery/dress_62_0.jpg`,
+      bucket_key: `${import.meta.env.BASE_URL}image_gallery/dress_62_0.jpg`,
     },
     {
       product_id: 4,
@@ -43,7 +43,7 @@ export const dummmyProducts: Product[] = [
       seller_id: 'user_98765',
       category_id: 4,
       creation_date: '2024-09-24',
-      bucket_key: `/src/assets/image_gallery/dress_62_0.jpg`,
+      bucket_key: `${import.meta.env.BASE_URL}image_gallery/dress_62_0.jpg`,
     },
     {
       product_id: 5,
@@ -54,6 +54,6 @@ export const dummmyProducts: Product[] = [
       seller_id: 'user_24680',
       category_id: 5,
       creation_date: '2024-09-23',
-      bucket_key: `/src/assets/image_gallery/dress_62_0.jpg`,
+      bucket_key: `${import.meta.env.BASE_URL}image_gallery/dress_62_0.jpg`,
     },
   ];

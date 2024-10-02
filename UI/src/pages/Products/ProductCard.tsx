@@ -18,9 +18,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, icon, className, chi
         <CardTitle className="flex justify-between items-center">
           {product.name} {icon}
         </CardTitle>
-        <CardDescription className="overflow-hidden whitespace-nowrap text-ellipsis max-w-prose">
-          {product.description}
-        </CardDescription>
+
+        <div className="flex justify-between">
+          <CardDescription className=" overflow-hidden whitespace-nowrap text-ellipsis max-w-prose">
+            {product.description}
+          </CardDescription>
+          <CardDescription>
+            <p className="font-bold text-sm">{`${product.price}€`}</p>
+          </CardDescription>
+        </div>
       </CardHeader>
       <CardContent className="flex items-center justify-center pt-0">{children}</CardContent>
     </Card>

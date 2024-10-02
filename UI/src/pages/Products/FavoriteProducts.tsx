@@ -13,7 +13,7 @@ const FavoriteProductsContainer: React.FC<FavoriteProducts> = ({
   icon,
 }) => {
   return (
-    <div className="flex flex-col items-center justify-start bg-coral p-10 border-t border-t-jet min-h-[80dvh] md:min-h-[40dvh]">
+    <div className="flex flex-col items-center justify-start bg-coral p-10 border-t border-t-jet min-h-[80vh] md:min-h-[40vh]">
       <h2 className="font-bold mb-4">
         {isAuthenticated
           ? `Here are your favorite products`

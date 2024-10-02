@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Welcome to Re-Vibe! This project is designed to showcase a demo website for selling used clothing and potentially other items in the future. The aim is to create a platform where users can list, browse, and purchase second-hand clothes. As we develop the project, we plan to incorporate additional features and enhancements to improve the user experience and expand functionality. This project utilizes Rust for the backend, along with the Diesel ORM and PostgreSQL for robust data management.
+Welcome to Re-Vibe! This project is designed to showcase a demo website for selling used clothing and potentially other items in the future. The aim is to create a platform where users can list, browse, and purchase second-hand clothes. As I develop the project, I plan to incorporate additional features and enhancements to improve the user experience and expand functionality. This project utilizes Rust for the backend, along with the Rocket, Diesel ORM and PostgreSQL for robust data management.
 
 ## Table of Contents
 
