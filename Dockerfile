@@ -39,13 +39,13 @@ FROM node:18 as frontend
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY ./UI/package*.json ./
+COPY ./src/UI/package*.json ./
 
 # Install frontend dependencies
 RUN npm install
 
 # Copy source code and build the frontend
-COPY ./UI ./
+COPY ./src/UI ./
 RUN npm run build
 
 # Deploy Stage
@@ -85,7 +85,7 @@ COPY --from=builder /target/release/ /
 COPY ./Rocket.toml .
 
 # Copy Vite build assets
-COPY --from=frontend /app/dist /UI/dist
+COPY --from=frontend /app/dist /src/UI/dist
 
 # Run the binary
 CMD ["./main"]

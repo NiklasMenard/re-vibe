@@ -25,7 +25,7 @@ pub async fn not_found(req: &rocket::Request<'_>) -> Result<NamedFile, Redirect>
     }
 
     // Serve the `index.html` for React routing
-    NamedFile::open(Path::new("UI/dist/index.html"))
+    NamedFile::open(Path::new("src/UI/dist/index.html"))
         .await
         .map_err(|_| Redirect::to("/"))
 }

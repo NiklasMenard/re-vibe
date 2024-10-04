@@ -127,5 +127,5 @@ fn rocket() -> _ {
                 auth_handler::logout
             ],
         )
-        .mount("/", FileServer::from("UI/dist"))
+        .mount("/", FileServer::from("src/UI/dist"))
 }
