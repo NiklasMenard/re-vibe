@@ -6,7 +6,10 @@ use domain::{
         users::{self},
     },
 };
-use infrastructure::database::connection::establish_connection;
+use infrastructure::{
+    database::connection::establish_connection,
+    s3_client::{create_client, generate_presigned_url},
+};
 use rocket::http::Status;
 use shared::response_models::{Response, ResponseBody};
 use uuid::Uuid;
@@ -14,7 +17,7 @@ use uuid::Uuid;
 pub async fn list_favorite_products(user_id: Uuid) -> Result<String, Status> {
     let connect = &mut establish_connection();
 
-    match user_favorite_products::table
+    let products = user_favorite_products::table
         .inner_join(users::table.on(user_favorite_products::user_id.eq(users::id)))
         .inner_join(products::table.on(user_favorite_products::product_id.eq(products::product_id)))
         .filter(user_favorite_products::user_id.eq(user_id))
@@ -30,16 +33,46 @@ pub async fn list_favorite_products(user_id: Uuid) -> Result<String, Status> {
             products::bucket_key,
         ))
         .load::<Product>(connect)
-    {
-        Ok(products) => {
-            let response = Response {
-                body: ResponseBody::Products(products),
-            };
-            Ok(serde_json::to_string(&response).unwrap())
-        }
-        Err(err) => {
+        .map_err(|err| {
             eprintln!("Database error - {}", err);
-            Err(Status::InternalServerError)
-        }
+            Status::InternalServerError
+        })?;
+
+    //Create S3 Client
+    let client = create_client().await.unwrap();
+
+    // Fetch S3 client
+    let mut products_with_urls = Vec::new();
+    for product in products {
+        let bucket_key_with_extension = format!("medium_images/{}.jpg", &product.bucket_key);
+
+        let image_url = generate_presigned_url(
+            &client,
+            "re-vibe",
+            &bucket_key_with_extension,
+            3600, // URL expiration time in seconds
+        )
+        .await
+        .unwrap();
+
+        products_with_urls.push(Product {
+            product_id: product.product_id,
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            quantity: product.quantity,
+            seller_id: product.seller_id,
+            category_id: product.category_id,
+            creation_date: product.creation_date,
+            bucket_key: image_url,
+        });
     }
+
+    products_with_urls.sort_by(|a, b| a.name.cmp(&b.name));
+
+    let response = Response {
+        body: ResponseBody::Products(products_with_urls),
+    };
+
+    Ok(serde_json::to_string(&response).unwrap())
 }

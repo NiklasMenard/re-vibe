@@ -1,16 +1,16 @@
-import { Product, ProductsResponse } from '@/types/types';
 import ProductCard from './ProductCard';
-
+import ProductImage from '@/components/ProductImage';
+import { Product, ProductsResponse } from '@/types/types';
 interface FavoriteProducts {
   favoriteProducts: ProductsResponse | null;
-  isAuthenticated: boolean;
   icon: (product: Product) => React.ReactNode;
+  isAuthenticated: boolean;
 }
 
 const FavoriteProductsContainer: React.FC<FavoriteProducts> = ({
   favoriteProducts,
-  isAuthenticated,
   icon,
+  isAuthenticated,
 }) => {
   return (
     <div className="flex flex-col items-center justify-start bg-coral p-10 border-t border-t-jet min-h-[80vh] md:min-h-[40vh]">
@@ -28,13 +28,7 @@ const FavoriteProductsContainer: React.FC<FavoriteProducts> = ({
                 product={product}
                 icon={isAuthenticated ? icon(product) : null}
               >
-                <img
-                  src={product.bucket_key}
-                  alt={product.name}
-                  width="320"
-                  height="320"
-                  className="max-w-full h-auto object-contain border-2 border-jet"
-                />
+                <ProductImage product={product} width="320" height="320" />
               </ProductCard>
             ))
           : null}

@@ -1,17 +1,48 @@
-use diesel::prelude::*;
-use domain::{models::Product, schema::products};
+use diesel::{dsl::count_star, prelude::*};
+use domain::{
+    models::{PaginatedProducts, Product},
+    schema::products,
+};
 use infrastructure::{
     database::connection::establish_connection,
     s3_client::{create_client, generate_presigned_url},
 };
-use rocket::http::Status;
-use shared::response_models::{Response, ResponseBody};
+use rocket::{http::Status, serde::json::Json};
+use shared::{
+    request_models::ProductFilter,
+    response_models::{Response, ResponseBody},
+};
 
-pub async fn list_products() -> Result<String, Status> {
+pub async fn list_products(
+    page: Option<i64>,
+    page_size: Option<i64>,
+    filter: Option<Json<ProductFilter>>,
+) -> Result<String, Status> {
     let connect = &mut establish_connection();
 
-    let products = products::table
-        .select(products::all_columns)
+    let mut query = products::table.select(products::all_columns).into_boxed();
+
+    if let Some(filter_json) = filter {
+        query = query.filter(products::name.like(format!("%{}%", filter_json.into_inner().name)));
+    }
+
+    let total_count: i64 = match products::table.select(count_star()).first(connect) {
+        Ok(result) => result,
+        Err(err) => {
+            eprintln!("Database error - {}", err);
+            return Err(Status::InternalServerError);
+        }
+    };
+
+    let page = page.unwrap_or(1).max(1);
+    let page_size = page_size.unwrap_or(5).max(5);
+
+    let offset: i64 = (page - 1) * page_size.min(total_count);
+
+    // Fetch products with pagination
+    let products = query
+        .limit(page_size)
+        .offset(offset)
         .load::<Product>(connect)
         .map_err(|err| {
             eprintln!("Database error - {}", err);
@@ -51,7 +82,12 @@ pub async fn list_products() -> Result<String, Status> {
     products_with_urls.sort_by(|a, b| a.name.cmp(&b.name));
 
     let response = Response {
-        body: ResponseBody::Products(products_with_urls),
+        body: ResponseBody::PaginatedProducts(PaginatedProducts {
+            products: products_with_urls,
+            total_count,
+            total_pages: (total_count + page_size - 1) / page_size,
+            current_page: page,
+        }),
     };
 
     Ok(serde_json::to_string(&response).unwrap())

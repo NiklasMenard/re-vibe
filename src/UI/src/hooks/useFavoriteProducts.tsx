@@ -5,7 +5,11 @@ import { Product, ProductsResponse } from '@/types/types';
 
 const useFavoriteProducts = () => {
   const { getUserId } = useAuth();
-  const { data, sendRequest: fetchFavoriteProducts } = useRequest<ProductsResponse>({
+  const {
+    data,
+    sendRequest: fetchFavoriteProducts,
+    loading,
+  } = useRequest<ProductsResponse>({
     url: `/user/${getUserId()}/favorites`,
     auth: true,
   });
@@ -16,13 +20,16 @@ const useFavoriteProducts = () => {
 
   const likeProduct = async (item: Product) => {
     await favoriteProduct(`/user/${getUserId()}/favorites/${item.product_id}`, 'POST');
-    fetchFavoriteProducts();
+    await fetchFavoriteProducts();
   };
 
   const unlikeProduct = async (item: Product) => {
     await favoriteProduct(`/user/${getUserId()}/favorites/${item.product_id}`, 'DELETE');
-    fetchFavoriteProducts();
+    await fetchFavoriteProducts();
   };
+
+  const isProductLiked = (product: Product): boolean =>
+    data?.products?.some(({ product_id }) => product_id === product.product_id) || false;
 
   useEffect(() => {
     if (getUserId() !== null) {
@@ -30,7 +37,7 @@ const useFavoriteProducts = () => {
     }
   }, [fetchFavoriteProducts, getUserId]);
 
-  return { favoriteProducts: data, likeProduct, unlikeProduct };
+  return { favoriteProducts: data, likeProduct, unlikeProduct, isProductLiked, loading };
 };
 
 export default useFavoriteProducts;
