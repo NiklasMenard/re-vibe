@@ -1,14 +1,28 @@
+import { useEffect, useState } from 'react';
 import useRequest from './useRequest';
-import { ProductsResponse } from '@/types/types';
+import { Pagination, PaginatedProductsResponse } from '@/types/types';
 
-const useProducts = () => {
-  const { data, loading, error } = useRequest<ProductsResponse>({
-    url: `/api/products`,
+const useProducts = (pagination: Pagination) => {
+  const { data, loading, error } = useRequest<PaginatedProductsResponse>({
+    url: `/api/products?page=${pagination.page}&page_size=${pagination.pageSize}`,
     refresh: true,
     auth: false,
   });
 
-  return { fetchedProducts: data, loading, error };
+  const [fetchedProducts, setFetchedProducts] = useState<
+    PaginatedProductsResponse['paginatedProducts']['products']
+  >([]);
+
+  const totalCount = data?.paginatedProducts.total_count ?? 0;
+
+  useEffect(() => {
+    if (data) {
+      // Append new products to the existing fetched products state
+      setFetchedProducts((prevProducts) => [...prevProducts, ...data.paginatedProducts.products]);
+    }
+  }, [data]);
+
+  return { fetchedProducts, loading, error, totalCount };
 };
 
 export default useProducts;

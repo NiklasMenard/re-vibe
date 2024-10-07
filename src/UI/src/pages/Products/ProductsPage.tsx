@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Product, ProductsResponse } from '../../types/types';
+import { Pagination } from '../../types/types';
 
 import Header from '../../components/Header';
 import Carousel from '@/components/Carousel';
@@ -12,50 +12,45 @@ import FavoriteIcon from '@/components/FavoriteIcon';
 import { useAuth } from '@/hooks/useAuth';
 
 import FavoriteProductsContainer from './FavoriteProducts';
-import { dummmyProducts } from '@/constants/dummy';
+import ProductImage from '@/components/ProductImage';
+
+const defaultPagination: Pagination = { page: 1, pageSize: 5 };
 
 const ProductsPage = () => {
-  const [loadedImages, setLoadedImages] = useState(new Set());
+  const [pagination, setPagination] = useState(defaultPagination);
 
   const { isAuthenticated } = useAuth();
 
-  const { fetchedProducts, loading, error } = useProducts();
-  const { favoriteProducts, likeProduct, unlikeProduct } = useFavoriteProducts();
+  const { fetchedProducts, loading, error, totalCount } = useProducts(pagination);
 
-  const products = import.meta.env.DEV
-    ? dummmyProducts
-    : fetchedProducts?.products.slice(0, 5) || [];
+  // const products = import.meta.env.DEV ? dummmyProducts : fetchedProducts;
 
-  const handleImageLoad = (productId: number) => {
-    setLoadedImages((prev) => new Set(prev).add(productId));
-  };
+  const { favoriteProducts, likeProduct, unlikeProduct, isProductLiked } = useFavoriteProducts();
 
-  const allImagesLoaded = products.length > 0 && loadedImages.size === products.length;
-  const loadedAndNoErrorState = !loading && !error && fetchedProducts?.products?.length === 0;
-  const isProductLiked = (product: Product): boolean =>
-    favoriteProducts?.products?.some(({ product_id }) => product_id === product.product_id) ||
-    false;
+  const loadedAndNoErrorState = !loading && !error;
 
-  const favoriteProductsResponse: ProductsResponse = {
-    products:
-      products.filter((product: Product) =>
-        favoriteProducts?.products
-          .map((favorite) => favorite.product_id)
-          .includes(product.product_id)
-      ) || [],
+  const initialIndex = Math.floor(pagination.pageSize / 2);
+
+  const handleNextClick = (index: number) => {
+    if (fetchedProducts.length < totalCount && index === fetchedProducts.length - 2) {
+      setPagination((prev) => ({ ...prev, page: prev.page + 1 }));
+    }
   };
 
   return (
     <div className="flex flex-col min-h-[100vh] overflow-y-auto overflow-x-hidden">
       <Header />
-      <Carousel renderCards={loadedAndNoErrorState} renderOverlays={!loading && allImagesLoaded}>
-        {products.map((product) => (
+
+      <Carousel
+        initialIndex={initialIndex}
+        onNextClick={handleNextClick}
+        renderCards={loadedAndNoErrorState}
+      >
+        {fetchedProducts.map((product) => (
           <ProductCard
             key={product.product_id}
             product={product}
-            className={`transition-opacity duration-300 ${
-              allImagesLoaded ? 'opacity-100' : 'opacity-0'
-            }  max-w-[70vw]`}
+            className={`max-w-[70vw]`}
             icon={
               isAuthenticated ? (
                 <FavoriteIcon
@@ -67,18 +62,13 @@ const ProductsPage = () => {
               ) : null
             }
           >
-            <img
-              src={product.bucket_key}
-              alt={product.name}
-              width="512"
-              height="512"
-              onLoad={() => handleImageLoad(product.product_id)}
-              className="max-w-full h-auto object-contain border-2 border-jet"
-            />
+            <ProductImage product={product} />
           </ProductCard>
         ))}
       </Carousel>
+
       <FavoriteProductsContainer
+        favoriteProducts={favoriteProducts}
         icon={(product) => (
           <FavoriteIcon
             isLiked={isProductLiked(product)}
@@ -87,7 +77,6 @@ const ProductsPage = () => {
             unlikeItem={unlikeProduct}
           />
         )}
-        favoriteProducts={favoriteProductsResponse}
         isAuthenticated={isAuthenticated}
       />
       <Footer />

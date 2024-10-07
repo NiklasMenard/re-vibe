@@ -1,11 +1,14 @@
 import useSwipe from '@/hooks/useSwipe';
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 
 import { ArrowButton } from './Buttons';
 
 interface CarouselProps {
   renderCards?: boolean;
   renderOverlays?: boolean;
+  onNextClick?: (index: number) => void;
+  onPrevClick?: (index: number) => void;
+  initialIndex?: number;
   children: React.ReactNode[];
 }
 
@@ -64,19 +67,36 @@ const CardWrapper: React.FC<CardWrapperProps> = ({ children, className, ...props
 
 const Carousel: React.FC<CarouselProps> = ({
   renderCards = false,
-  renderOverlays = false,
+  renderOverlays = true,
+  onNextClick,
+  onPrevClick,
+  initialIndex = 0,
   children,
 }) => {
-  const [currentIndex, setCurrentIndex] = useState<number>(2);
+  const [currentIndex, setCurrentIndex] = useState<number>(initialIndex);
 
   const prevSlide = (): void => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? 0 : prevIndex - 1));
+    setCurrentIndex((prevIndex) => {
+      const newIndex = prevIndex === 0 ? 0 : prevIndex - 1;
+
+      if (onPrevClick) {
+        onPrevClick(newIndex);
+      }
+
+      return newIndex;
+    });
   };
 
   const nextSlide = (): void => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === children.length - 1 ? children.length - 1 : prevIndex + 1
-    );
+    setCurrentIndex((prevIndex) => {
+      const newIndex = prevIndex === children.length - 1 ? children.length - 1 : prevIndex + 1;
+
+      if (onNextClick) {
+        onNextClick(newIndex);
+      }
+
+      return newIndex;
+    });
   };
 
   const calculateZIndex = (index: number) => {
@@ -95,28 +115,35 @@ const Carousel: React.FC<CarouselProps> = ({
 
   const handleSwipe = (direction: 'left' | 'right') => {
     if (direction === 'right') {
-      nextSlide();
+      prevSlide(); // Move to the previous slide
     } else if (direction === 'left') {
-      prevSlide();
+      nextSlide(); // Move to the next slide
     }
   };
 
   const { swipeStyle, onTouchEnd, onTouchStart } = useSwipe(handleSwipe);
 
   const animatePosition = (index: number) => {
-    // Center card
     if (index === currentIndex) {
-      return 'translate-x-0 scale-110 opacity-100';
+      return 'translate-x-0 scale-110 opacity-100'; // Center card
     }
 
-    if (index < currentIndex) {
-      return 'translate-x-[65%] scale-75 '; // Move to left
+    if (index === currentIndex + 1 || index === currentIndex - 1) {
+      return `${index > currentIndex ? 'translate-x-[65%]' : '-translate-x-[65%]'} scale-75`;
     }
 
-    if (index > currentIndex) {
-      return '-translate-x-[65%] scale-75 '; // Move to right
+    if (index > currentIndex + 1 || index < currentIndex - 1) {
+      return `${index > currentIndex ? 'translate-x-[65%]' : '-translate-x-[65%]'} scale-75 hidden`;
     }
   };
+
+  const [visible, setVisible] = useState(false);
+
+  useLayoutEffect(() => {
+    if (renderCards) {
+      setVisible(true);
+    }
+  }, [renderCards]);
 
   return (
     <div className="flex justify-center items-center relative flex-1 px-10 min-h-[85vh]">
@@ -126,8 +153,14 @@ const Carousel: React.FC<CarouselProps> = ({
         className="touch-hidden position absolute bottom-10 xl:bottom-[50%] left-10"
       />
       <div className="relative flex-grow flex items-center ">
-        <div className="flex items-center justify-center flex-1">
-          {!renderCards ? (
+        <div
+          className={`flex items-center justify-center flex-1   transition-opacity duration-300 ${
+            visible ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          {renderCards && children.length === 0 ? (
+            <p>No products</p>
+          ) : (
             children.map((card, index) => (
               <CardWrapper
                 key={index}
@@ -143,14 +176,12 @@ const Carousel: React.FC<CarouselProps> = ({
                 {renderOverlays && generateOverlay(currentIndex, index)}
               </CardWrapper>
             ))
-          ) : (
-            <p>No products</p>
           )}
         </div>
       </div>
       <ArrowButton
         onClick={nextSlide}
-        className="touch-hidden position absolute bottom-10  xl:bottom-[50%] right-10"
+        className="touch-hidden position absolute bottom-10 xl:bottom-[50%] right-10"
       />
     </div>
   );

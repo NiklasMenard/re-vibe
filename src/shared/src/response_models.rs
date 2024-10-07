@@ -1,6 +1,6 @@
 // shared/src/response_models.rs
 
-use domain::models::{Product, User};
+use domain::models::{PaginatedProducts, Product, User};
 use rocket::serde::Serialize;
 
 #[derive(Serialize)]
@@ -9,6 +9,7 @@ pub enum ResponseBody {
     Message(String),
     Product(Product),
     Products(Vec<Product>),
+    PaginatedProducts(PaginatedProducts),
     User(User),
 }
 

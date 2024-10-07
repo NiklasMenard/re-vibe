@@ -109,6 +109,14 @@ pub struct Product {
     pub bucket_key: String,
 }
 
+#[derive(Serialize)]
+pub struct PaginatedProducts {
+    pub products: Vec<Product>,
+    pub total_count: i64,
+    pub total_pages: i64,
+    pub current_page: i64,
+}
+
 #[derive(Insertable, Deserialize)]
 #[serde(crate = "rocket::serde")]
 #[diesel(table_name = products)]

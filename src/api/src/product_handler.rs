@@ -1,15 +1,23 @@
 use application::product::{create, delete, read, update};
 use domain::models::NewProduct;
 use infrastructure::auth::UserApiKey;
-
 use rocket::http::Status;
+use shared::request_models::ProductFilter;
 
 use rocket::serde::json::Json;
 use rocket::{delete, get, post, put};
 
-#[get("/products")]
-pub async fn list_products_handler() -> Result<String, Status> {
-    read::list_products().await
+#[get(
+    "/products?<page>&<page_size>",
+    format = "application/json",
+    data = "<filter>"
+)]
+pub async fn list_products_handler(
+    page: Option<i64>,
+    page_size: Option<i64>,
+    filter: Option<Json<ProductFilter>>,
+) -> Result<String, Status> {
+    read::list_products(page, page_size, filter).await
 }
 
 #[get("/products/<product_id>")]
