@@ -23,9 +23,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, icon, className, chi
           <CardDescription className=" overflow-hidden whitespace-nowrap text-ellipsis max-w-prose">
             {product.description}
           </CardDescription>
-          <CardDescription>
-            <p className="font-bold text-sm">{`${product.price}€`}</p>
-          </CardDescription>
+          <CardDescription className="font-bold text-sm text-jet">{`${product.price}€`}</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="flex items-center justify-center pt-0">{children}</CardContent>

@@ -21,13 +21,22 @@ const LoginPage = () => {
   return (
     <div className="flex flex-col items-center justify-center h-screen">
       <Header />
+
+      <Label className="mb-6 p-4 bg-indigo-50 text-indigo-700 border border-indigo-300 rounded-lg text-center">
+        <p className="font-semibold">For demo purposes</p>
+        <p className="mt-1">
+          Username: <span className="font-mono">test-user</span>
+        </p>
+        <p className="mt-1">
+          Password: <span className="font-mono">password</span>
+        </p>
+      </Label>
+
       <div className="flex flex-col items-center p-6 bg-white shadow-md rounded-lg max-w-sm mx-10">
         <h2 className="text-xl font-bold mb-4">Login</h2>
         {error && <div className="text-red-500 mb-4">{error}</div>}
         <form onSubmit={handleSubmit} className="w-full">
           <div className="mb-10">
-            <p>Username: test-user </p>
-            <p className="mb-10">Password: password</p>
             <Label htmlFor="email">Username:</Label>
             <Input
               type="text"
