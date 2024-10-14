@@ -32,7 +32,7 @@ pub async fn post_product(product: Json<NewProduct>) -> Result<String, Status> {
     {
         Ok(_) => {
             let response = Response {
-                body: ResponseBody::Message("Product favorited successfully".to_string()),
+                body: ResponseBody::Message("Product created successfully".to_string()),
             };
             Ok(serde_json::to_string(&response).unwrap())
         }

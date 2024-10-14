@@ -8,6 +8,8 @@ interface CarouselProps {
   renderOverlays?: boolean;
   onNextClick?: (index: number) => void;
   onPrevClick?: (index: number) => void;
+  nextButtonText?: React.ReactNode;
+  prevButtonText?: React.ReactNode;
   initialIndex?: number;
   children: React.ReactNode[];
 }
@@ -70,33 +72,31 @@ const Carousel: React.FC<CarouselProps> = ({
   renderOverlays = true,
   onNextClick,
   onPrevClick,
+  prevButtonText,
+  nextButtonText,
   initialIndex = 0,
   children,
 }) => {
   const [currentIndex, setCurrentIndex] = useState<number>(initialIndex);
 
-  const prevSlide = (): void => {
-    setCurrentIndex((prevIndex) => {
-      const newIndex = prevIndex === 0 ? 0 : prevIndex - 1;
+  const prevSlide = (index: number): void => {
+    const newIndex = Math.max(index - 1, 0);
 
-      if (onPrevClick) {
-        onPrevClick(newIndex);
-      }
+    setCurrentIndex(newIndex);
 
-      return newIndex;
-    });
+    if (onPrevClick) {
+      onPrevClick(index);
+    }
   };
 
-  const nextSlide = (): void => {
-    setCurrentIndex((prevIndex) => {
-      const newIndex = prevIndex === children.length - 1 ? children.length - 1 : prevIndex + 1;
+  const nextSlide = (index: number): void => {
+    const newIndex = Math.min(index + 1, children.length - 1);
 
-      if (onNextClick) {
-        onNextClick(newIndex);
-      }
+    setCurrentIndex(newIndex);
 
-      return newIndex;
-    });
+    if (onNextClick) {
+      onNextClick(index);
+    }
   };
 
   const calculateZIndex = (index: number) => {
@@ -113,15 +113,15 @@ const Carousel: React.FC<CarouselProps> = ({
     }
   };
 
-  const handleSwipe = (direction: 'left' | 'right') => {
+  const handleSwipe = (direction: 'left' | 'right', index: number) => {
     if (direction === 'right') {
-      prevSlide(); // Move to the previous slide
+      prevSlide(index); // Move to the previous slide
     } else if (direction === 'left') {
-      nextSlide(); // Move to the next slide
+      nextSlide(index); // Move to the next slide
     }
   };
 
-  const { swipeStyle, onTouchEnd, onTouchStart } = useSwipe(handleSwipe);
+  const { onTouchEnd, onTouchStart } = useSwipe(handleSwipe);
 
   const animatePosition = (index: number) => {
     if (index === currentIndex) {
@@ -129,32 +129,32 @@ const Carousel: React.FC<CarouselProps> = ({
     }
 
     if (index === currentIndex + 1 || index === currentIndex - 1) {
-      return `${index > currentIndex ? 'translate-x-[65%]' : '-translate-x-[65%]'} scale-75`;
+      return `${index > currentIndex ? 'translate-x-[70%]' : '-translate-x-[70%]'} scale-75`;
     }
 
     if (index > currentIndex + 1 || index < currentIndex - 1) {
-      return `${index > currentIndex ? 'translate-x-[65%]' : '-translate-x-[65%]'} scale-75 hidden`;
+      return `${index > currentIndex ? 'translate-x-[70%]' : '-translate-x-[70%]'} scale-50`;
     }
   };
 
   const [visible, setVisible] = useState(false);
 
   useLayoutEffect(() => {
-    if (renderCards) {
-      setVisible(true);
-    }
-  }, [renderCards]);
+    setVisible(true);
+  }, []);
 
   return (
     <div className="flex justify-center items-center relative flex-1 px-10 min-h-[85vh]">
       <ArrowButton
-        onClick={prevSlide}
+        onClick={() => prevSlide(currentIndex)}
         direction="left"
-        className="touch-hidden position absolute bottom-10 xl:bottom-[50%] left-10"
-      />
+        className=" position absolute bottom-10 xl:bottom-[50%] left-10"
+      >
+        {prevButtonText}
+      </ArrowButton>
       <div className="relative flex-grow flex items-center ">
         <div
-          className={`flex items-center justify-center flex-1   transition-opacity duration-300 ${
+          className={`flex items-center justify-center flex-1 transition-opacity duration-300 ${
             visible ? 'opacity-100' : 'opacity-0'
           }`}
         >
@@ -166,10 +166,9 @@ const Carousel: React.FC<CarouselProps> = ({
                 key={index}
                 style={{
                   zIndex: calculateZIndex(index),
-                  ...swipeStyle,
                 }}
                 onTouchStart={onTouchStart}
-                onTouchEnd={onTouchEnd}
+                onTouchEnd={(e) => onTouchEnd(e, currentIndex)}
                 className={`${animatePosition(index)}`}
               >
                 {card}
@@ -180,9 +179,11 @@ const Carousel: React.FC<CarouselProps> = ({
         </div>
       </div>
       <ArrowButton
-        onClick={nextSlide}
-        className="touch-hidden position absolute bottom-10 xl:bottom-[50%] right-10"
-      />
+        onClick={() => nextSlide(currentIndex)}
+        className=" position absolute bottom-10 xl:bottom-[50%] right-10"
+      >
+        {nextButtonText}
+      </ArrowButton>
     </div>
   );
 };
