@@ -13,7 +13,7 @@ import FavoriteProductsContainer from './FavoriteProducts';
 import ProductImage from '@/components/ProductImage';
 
 const DEFAULT_PAGINATION: Pagination = { page: 1, pageSize: 5 };
-const MAX_DISPLAYED_PRODUCTS = 40;
+const MAX_DISPLAYED_PRODUCTS = 30;
 
 enum SliceState {
   Start = 'START',
@@ -45,7 +45,11 @@ const ProductsPage = () => {
       setPagination((prev) => ({ ...prev, page: prev.page + 1 }));
     }
 
-    setSliceState(index + 1 === displayedProducts.length - 1 ? SliceState.End : SliceState.Middle);
+    setSliceState(
+      index + 1 === displayedProducts.length - 1 && displayedProducts.length > 5
+        ? SliceState.End
+        : SliceState.Middle
+    );
 
     if (index === displayedProducts.length - 1) {
       setWindowSlice((prev) => prev + 1);
