@@ -18,6 +18,32 @@
   }
 }
 
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(0) scale(0.75);
+  }
+  to {
+    transform: translateX(-70%)  scale(0.75);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(0)  scale(0.75);
+  }
+  to {
+    transform: translateX(70%)  scale(0.75);
+  }
+}
+
+.slide-in-left {
+  animation: slideInFromLeft 0.5s ease-out;
+}
+
+.slide-in-right {
+  animation: slideInFromRight 0.5s ease-out;
+}
+
 .image-wrapper {
   display: flex;
   flex-direction: column;

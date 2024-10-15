@@ -26,7 +26,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, icon, className, chi
           <CardDescription className="font-bold text-sm text-jet">{`${product.price}€`}</CardDescription>
         </div>
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="flex items-center justify-center pt-0">{children}</CardContent>
     </Card>
   );
 };

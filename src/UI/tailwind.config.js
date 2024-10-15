@@ -9,6 +9,7 @@ module.exports = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
 		  screens: {
+			'carousel': '1350px',
 			'fullhd': '1920px', // Full HD resolution (1080p)
 			'2k': '2560px',     // 2K resolution (WQHD)
 			'4k': '3840px',     // 4K resolution (UHD)

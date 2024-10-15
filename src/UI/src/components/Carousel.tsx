@@ -1,5 +1,5 @@
 import useSwipe from '@/hooks/useSwipe';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { ArrowButton } from './Buttons';
 
@@ -32,7 +32,7 @@ const RightToLeftOverlay = () => {
   );
 };
 
-const generateOverlay = (currentIndex: number, index: number) => {
+const generateOverlay = (index: number, currentIndex: number) => {
   if (index === currentIndex) {
     return null;
   }
@@ -44,6 +44,36 @@ const generateOverlay = (currentIndex: number, index: number) => {
   if (index > currentIndex) {
     return <RightToLeftOverlay />;
   }
+};
+
+const animatePosition = (index: number, currentIndex: number) => {
+  if (index >= currentIndex + 3 || index <= currentIndex - 3) {
+    return 'hidden';
+  }
+
+  if (index === currentIndex) {
+    return 'translate-x-0 scale-110 opacity-100'; // Center card
+  }
+
+  if (index === currentIndex + 1 || index === currentIndex - 1) {
+    return `${index > currentIndex ? 'translate-x-[70%]' : '-translate-x-[70%]'} scale-75`;
+  }
+
+  if (index > currentIndex + 1 || index < currentIndex - 1) {
+    return `${index > currentIndex ? 'translate-x-[70%]' : '-translate-x-[70%]'} scale-50`;
+  }
+};
+
+const animateFirstRender = (index: number, currentIndex: number, firstRender: boolean) => {
+  // Trigger the animation only for slides that are not the current index during the first render
+  if (firstRender) {
+    if (index < currentIndex) {
+      return 'slide-in-left';
+    } else if (index > currentIndex) {
+      return 'slide-in-right';
+    }
+  }
+  return ''; // No animation after the first render
 };
 
 interface CardWrapperProps {
@@ -123,41 +153,44 @@ const Carousel: React.FC<CarouselProps> = ({
 
   const { onTouchEnd, onTouchStart } = useSwipe(handleSwipe);
 
-  const animatePosition = (index: number) => {
-    if (index === currentIndex) {
-      return 'translate-x-0 scale-110 opacity-100'; // Center card
+  const [firstRender, setFirstRender] = useState(true);
+
+  const carouselRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleAnimationEnd = () => {
+      // Disable first render after the animation finishes
+      setFirstRender(false);
+    };
+
+    const carouselEl = carouselRef.current;
+
+    if (carouselEl) {
+      carouselEl.addEventListener('animationend', handleAnimationEnd);
     }
 
-    if (index === currentIndex + 1 || index === currentIndex - 1) {
-      return `${index > currentIndex ? 'translate-x-[70%]' : '-translate-x-[70%]'} scale-75`;
-    }
-
-    if (index > currentIndex + 1 || index < currentIndex - 1) {
-      return `${index > currentIndex ? 'translate-x-[70%]' : '-translate-x-[70%]'} scale-50`;
-    }
-  };
-
-  const [visible, setVisible] = useState(false);
-
-  useLayoutEffect(() => {
-    setVisible(true);
+    // Cleanup listener on unmount
+    return () => {
+      if (carouselEl) {
+        carouselEl.removeEventListener('animationend', handleAnimationEnd);
+      }
+    };
   }, []);
 
   return (
-    <div className="flex justify-center items-center relative flex-1 px-10 min-h-[85vh]">
+    <div
+      className="flex justify-center items-center relative flex-1 px-10 min-h-[85vh]"
+      ref={carouselRef}
+    >
       <ArrowButton
         onClick={() => prevSlide(currentIndex)}
         direction="left"
-        className=" position absolute bottom-10 xl:bottom-[50%] left-10"
+        className="position absolute bottom-10 carousel:bottom-[50%] left-10"
       >
         {prevButtonText}
       </ArrowButton>
       <div className="relative flex-grow flex items-center ">
-        <div
-          className={`flex items-center justify-center flex-1 transition-opacity duration-300 ${
-            visible ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
+        <div className={`flex items-center justify-center flex-1`}>
           {renderCards && children.length === 0 ? (
             <p>No products</p>
           ) : (
@@ -169,10 +202,12 @@ const Carousel: React.FC<CarouselProps> = ({
                 }}
                 onTouchStart={onTouchStart}
                 onTouchEnd={(e) => onTouchEnd(e, currentIndex)}
-                className={`${animatePosition(index)}`}
+                className={`
+                  ${animatePosition(index, currentIndex)} 
+                  ${animateFirstRender(index, currentIndex, firstRender)}`}
               >
                 {card}
-                {renderOverlays && generateOverlay(currentIndex, index)}
+                {renderOverlays && generateOverlay(index, currentIndex)}
               </CardWrapper>
             ))
           )}
@@ -180,7 +215,8 @@ const Carousel: React.FC<CarouselProps> = ({
       </div>
       <ArrowButton
         onClick={() => nextSlide(currentIndex)}
-        className=" position absolute bottom-10 xl:bottom-[50%] right-10"
+        direction="right"
+        className="position absolute bottom-10 carousel:bottom-[50%] right-10"
       >
         {nextButtonText}
       </ArrowButton>
