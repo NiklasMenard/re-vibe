@@ -185,7 +185,9 @@ const Carousel: React.FC<CarouselProps> = ({
       <ArrowButton
         onClick={() => prevSlide(currentIndex)}
         direction="left"
-        className="position absolute bottom-10 carousel:bottom-[50%] left-10"
+        className={`position absolute bottom-10 carousel:bottom-[50%] left-10 transition-opacity duration-500 ${
+          firstRender ? 'opacity-0' : 'opacity-100'
+        }`}
       >
         {prevButtonText}
       </ArrowButton>
@@ -216,7 +218,9 @@ const Carousel: React.FC<CarouselProps> = ({
       <ArrowButton
         onClick={() => nextSlide(currentIndex)}
         direction="right"
-        className="position absolute bottom-10 carousel:bottom-[50%] right-10"
+        className={`position absolute bottom-10 carousel:bottom-[50%] right-10 transition-opacity duration-500 ${
+          firstRender ? 'opacity-0' : 'opacity-100'
+        }`}
       >
         {nextButtonText}
       </ArrowButton>

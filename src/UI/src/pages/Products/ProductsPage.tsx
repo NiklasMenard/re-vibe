@@ -13,7 +13,7 @@ import FavoriteProductsContainer from './FavoriteProducts';
 import ProductImage from '@/components/ProductImage';
 
 const DEFAULT_PAGINATION: Pagination = { page: 1, pageSize: 5 };
-const MAX_DISPLAYED_PRODUCTS = 30;
+const MAX_DISPLAYED_PRODUCTS = 40;
 
 enum SliceState {
   Start = 'START',
@@ -39,6 +39,10 @@ const ProductsPage = () => {
   const initialIndex = calculateInitialIndex(displayedProducts.length);
 
   const handleNextClick = (index: number) => {
+    if (fetchedProducts.length === 0) {
+      return;
+    }
+
     const nearEnd = index === displayedProducts.length - initialIndex;
 
     if (nearEnd && fetchedProducts.length < totalCount) {
@@ -46,7 +50,8 @@ const ProductsPage = () => {
     }
 
     setSliceState(
-      index + 1 === displayedProducts.length - 1 && displayedProducts.length > 5
+      index + 1 === displayedProducts.length - 1 &&
+        displayedProducts.length === MAX_DISPLAYED_PRODUCTS
         ? SliceState.End
         : SliceState.Middle
     );
@@ -57,6 +62,9 @@ const ProductsPage = () => {
   };
 
   const handlePrevClick = (index: number) => {
+    if (fetchedProducts.length === 0) {
+      return;
+    }
     setSliceState(index === 1 ? SliceState.Start : SliceState.Middle);
 
     if (index <= 0 && windowSlice > 0) {
