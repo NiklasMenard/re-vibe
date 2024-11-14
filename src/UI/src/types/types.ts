@@ -31,6 +31,10 @@ export type ProductsResponse = {
 };
 
 
+export type ProductResponse = {
+  product: Product;
+};
+
 export interface Pagination {
     page: number,
     pageSize: number
