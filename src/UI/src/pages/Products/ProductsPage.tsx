@@ -33,7 +33,7 @@ const ProductsPage = () => {
   const { favoriteProducts, likeProduct, unlikeProduct, isProductLiked } = useFavoriteProducts();
 
   //Conditions
-  const loadedAndNoErrorState = !loading && !error;
+  const loadedAndNoErrorState = !loading && !error && fetchedProducts.length > 0;
   const sliceStart = windowSlice * MAX_DISPLAYED_PRODUCTS;
   const displayedProducts = fetchedProducts.slice(sliceStart, sliceStart + MAX_DISPLAYED_PRODUCTS);
   const initialIndex = calculateInitialIndex(displayedProducts.length);
