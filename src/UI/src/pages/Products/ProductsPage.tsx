@@ -39,7 +39,7 @@ const ProductsPage = () => {
   const initialIndex = calculateInitialIndex(displayedProducts.length);
 
   const handleNextClick = (index: number) => {
-    if (fetchedProducts.length === 0) {
+    if (!loadedAndNoErrorState) {
       return;
     }
 
@@ -62,9 +62,10 @@ const ProductsPage = () => {
   };
 
   const handlePrevClick = (index: number) => {
-    if (fetchedProducts.length === 0) {
+    if (!loadedAndNoErrorState) {
       return;
     }
+
     setSliceState(index === 1 ? SliceState.Start : SliceState.Middle);
 
     if (index <= 0 && windowSlice > 0) {
