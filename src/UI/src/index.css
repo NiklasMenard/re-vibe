@@ -65,7 +65,7 @@ html, body {
 }
 
 body {
-  height: 100%;
+  min-height: 100%;
   font-family: 'Roboto', sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -76,7 +76,7 @@ body {
 }
 
 #root {
-  height: 100%; 
+  min-height: 100%; 
   background-color: var(--vanilla) !important;
 }
 
@@ -84,6 +84,9 @@ ul {
   padding: 0;
   list-style-type: none;
   margin: 0;
+}
+ul li {
+  list-style: none
 }
 
 h1, h2, h3, h4, p, a, span, li {
@@ -117,7 +120,7 @@ h2, h3, a, li {
   font-size: clamp(1.3rem, -0.875rem + 8.333vw, 2rem);
 }
 
-p {
+p, li, a {
   font-size: clamp(1.2rem, -0.875rem + 1rem, 1.5rem);
 }
 

@@ -4,13 +4,21 @@ import { Product } from '@/types/types';
 interface ProductCardProps {
   product: Product;
   icon: React.ReactNode;
+  onClick?: () => void;
   className?: string;
   children: React.ReactNode;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, icon, className, children }) => {
+const ProductCard: React.FC<ProductCardProps> = ({
+  product,
+  icon,
+  onClick,
+  className,
+  children,
+}) => {
   return (
     <Card
+      onClick={onClick}
       className={`rounded-[1rem] overflow-hidden border border-jet
       ${className}`}
     >

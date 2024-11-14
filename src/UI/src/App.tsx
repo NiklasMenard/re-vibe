@@ -6,6 +6,7 @@ import { AuthProvider } from './hooks/useAuth';
 import Home from './pages/Home';
 import ProductsPage from './pages/Products/ProductsPage';
 import LoginPage from './pages/Login';
+import ProductDetailsPage from './pages/ProductDetails/ProductDetailsPage';
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/products/:id" element={<ProductDetailsPage />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
       </AuthProvider>

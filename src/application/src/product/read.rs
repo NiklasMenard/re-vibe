@@ -63,20 +63,29 @@ pub async fn list_products(
             &bucket_key_with_extension,
             3600, // URL expiration time in seconds
         )
-        .await
-        .unwrap();
+        .await;
 
-        products_with_urls.push(Product {
-            product_id: product.product_id,
-            name: product.name,
-            description: product.description,
-            price: product.price,
-            quantity: product.quantity,
-            seller_id: product.seller_id,
-            category_id: product.category_id,
-            creation_date: product.creation_date,
-            bucket_key: image_url,
-        });
+        match image_url {
+            Ok(url) => {
+                let product = Product {
+                    product_id: product.product_id,
+                    name: product.name,
+                    description: product.description,
+                    price: product.price,
+                    quantity: product.quantity,
+                    seller_id: product.seller_id,
+                    category_id: product.category_id,
+                    creation_date: product.creation_date,
+                    bucket_key: url,
+                };
+
+                products_with_urls.push(product);
+            }
+            Err(err) => {
+                eprintln!("S3 error - {}", err);
+                return Err(Status::InternalServerError);
+            }
+        }
     }
 
     products_with_urls.sort_by(|a, b| a.name.cmp(&b.name));
@@ -96,13 +105,45 @@ pub async fn list_products(
 pub async fn list_product(product_id: i32) -> Result<String, Status> {
     let connect = &mut establish_connection();
 
-    match products::table.find(product_id).first::<Product>(connect) {
+    let product = match products::table.find(product_id).first::<Product>(connect) {
         Ok(product) => {
-            let response = Response {
-                body: ResponseBody::Product(product),
-            };
+            let client = create_client().await.unwrap();
 
-            Ok(serde_json::to_string(&response).unwrap())
+            let bucket_key_with_extension = format!("large_images/{}.jpg", product.bucket_key);
+
+            let image_url = generate_presigned_url(
+                &client,
+                "re-vibe",
+                &bucket_key_with_extension,
+                3600, // URL expiration time in seconds
+            )
+            .await;
+
+            match image_url {
+                Ok(url) => {
+                    let product = Product {
+                        product_id: product.product_id,
+                        name: product.name,
+                        description: product.description,
+                        price: product.price,
+                        quantity: product.quantity,
+                        seller_id: product.seller_id,
+                        category_id: product.category_id,
+                        creation_date: product.creation_date,
+                        bucket_key: url,
+                    };
+
+                    let response = Response {
+                        body: ResponseBody::Product(product),
+                    };
+
+                    Ok(serde_json::to_string(&response).unwrap())
+                }
+                Err(err) => {
+                    eprintln!("S3 error - {}", err);
+                    Err(Status::InternalServerError)
+                }
+            }
         }
         Err(err) => match err {
             diesel::result::Error::NotFound => Err(Status::NotFound),
@@ -111,5 +152,7 @@ pub async fn list_product(product_id: i32) -> Result<String, Status> {
                 Err(Status::InternalServerError)
             }
         },
-    }
+    };
+
+    product
 }
