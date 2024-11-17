@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import ProductsPage from './pages/Products/ProductsPage';
 import LoginPage from './pages/Login';
 import ProductDetailsPage from './pages/ProductDetails/ProductDetailsPage';
+import FavoriteProductsPage from './pages/FavoriteProducts/FavoriteProductsPage';
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/favorites" element={<FavoriteProductsPage />} />
           <Route path="/products/:id" element={<ProductDetailsPage />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>

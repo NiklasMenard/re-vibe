@@ -9,10 +9,9 @@ import useFavoriteProducts from '@/hooks/useFavoriteProducts';
 import useProducts from '@/hooks/useProducts';
 import FavoriteIcon from '@/components/FavoriteIcon';
 import { useAuth } from '@/hooks/useAuth';
-import FavoriteProductsContainer from './FavoriteProducts';
 import ProductImage from '@/components/ProductImage';
 
-const DEFAULT_PAGINATION: Pagination = { page: 1, pageSize: 5 };
+const DEFAULT_PAGINATION: Pagination = { page: 1, pageSize: 20 };
 const MAX_DISPLAYED_PRODUCTS = 40;
 
 enum SliceState {
@@ -30,7 +29,7 @@ const ProductsPage = () => {
 
   const { isAuthenticated } = useAuth();
   const { fetchedProducts, loading, error, totalCount } = useProducts(pagination);
-  const { favoriteProducts, likeProduct, unlikeProduct, isProductLiked } = useFavoriteProducts();
+  const { likeProduct, unlikeProduct, isProductLiked } = useFavoriteProducts();
 
   //Conditions
   const loadedAndNoErrorState = !loading && !error && fetchedProducts.length > 0;
@@ -108,18 +107,6 @@ const ProductsPage = () => {
           </ProductCard>
         ))}
       </Carousel>
-      <FavoriteProductsContainer
-        favoriteProducts={favoriteProducts}
-        icon={(product) => (
-          <FavoriteIcon
-            isLiked={isProductLiked(product)}
-            item={product}
-            likeItem={likeProduct}
-            unlikeItem={unlikeProduct}
-          />
-        )}
-        isAuthenticated={isAuthenticated}
-      />
       <Footer />
     </div>
   );

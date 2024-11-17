@@ -18,6 +18,9 @@ const Header = () => {
         <Link className="font-bold hover:underline ml-16 hidden md:block" to="/products">
           Products
         </Link>
+        <Link className="font-bold hover:underline ml-16 hidden md:block" to="/favorites">
+          Favorites
+        </Link>
       </div>
       <HamburgerMenu />
       {loading ? null : isAuthenticated ? (

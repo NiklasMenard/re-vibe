@@ -1,7 +1,10 @@
+import { useAuth } from '@/hooks/useAuth';
 import React, { useState } from 'react';
 
 const HamburgerMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { isAuthenticated, logout } = useAuth();
 
   const toggleMenu = () => {
     setIsOpen((prev) => !prev);
@@ -34,10 +37,13 @@ const HamburgerMenu: React.FC = () => {
       >
         <ul className="space-y-6 text-center text-2xl">
           <li className="hover:text-black cursor-pointer">
-            <a href="/Login">Login</a>
+            {isAuthenticated ? <a onClick={logout}>Logout</a> : <a href="/Login">Login</a>}
           </li>
           <li className="hover:text-black cursor-pointer">
             <a href="/products">Products</a>
+          </li>
+          <li className="hover:text-black cursor-pointer">
+            <a href="/favorites">Favorites</a>
           </li>
         </ul>
       </div>

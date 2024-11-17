@@ -7,6 +7,7 @@ const useFavoriteProducts = () => {
   const { getUserId } = useAuth();
   const {
     data,
+    error,
     sendRequest: fetchFavoriteProducts,
     loading,
   } = useRequest<ProductsResponse>({
@@ -37,7 +38,7 @@ const useFavoriteProducts = () => {
     }
   }, [fetchFavoriteProducts, getUserId]);
 
-  return { favoriteProducts: data, likeProduct, unlikeProduct, isProductLiked, loading };
+  return { favoriteProducts: data, likeProduct, unlikeProduct, isProductLiked, loading, error };
 };
 
 export default useFavoriteProducts;
