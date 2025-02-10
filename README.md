@@ -47,15 +47,35 @@ Before you begin, ensure that the following prerequisites are installed on your 
    cargo build
    ```
 
-4. Create a `.env` file in the project root directory and configure the database connection settings. You can use the following template:
+4. Create a `.env` file in the project root directory and configure the database connection settings, keys and secrets. You can use the following template:
 
    ```env
+   # Database connection URL. Replace 'username' and 'password' with your PostgreSQL credentials.
    DATABASE_URL=postgres://username:password@localhost/re-vibe
+
+   # PostgreSQL password for the user specified in DATABASE_URL.
+   POSTGRES_PASSWORD=postgrespw
+
+   # Secret key used to sign and verify JSON Web Tokens (JWT). Should be a strong, secret string.
+   JWT_SECRET=jwtsecret
+
+   # DigitalOcean Access Key for authenticating API requests to DigitalOcean services.
+   DIGITAL_OCEAN_ACCESS_KEY=key
+
+   # DigitalOcean Secret Access Key for authenticating API requests to DigitalOcean services.
+   DIGITAL_SECRET_ACCESS_KEY=key
    ```
 
    Replace `username` and `password` with your PostgreSQL credentials.
 
-5. Set up the database schema and run initial migrations using Diesel:
+5. Create a `.env.development` file in the project src/UI directory to create a local Vite API URL reference for your server API, you can use the following template
+
+```env
+   # Base URL for API requests. Replace with your server's URL and port.
+   VITE_API_BASE_URL=http://localhost:8000
+```
+
+6. Set up the database schema and run initial migrations using Diesel:
 
    ```bash
    diesel setup

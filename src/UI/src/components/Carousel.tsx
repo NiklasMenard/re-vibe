@@ -14,6 +14,8 @@ interface CarouselProps {
   children: React.ReactNode[];
 }
 
+const isHighDpiMonitor = window.devicePixelRatio >= 2;
+
 const LeftToRightOverlay = () => {
   return (
     <div
@@ -52,7 +54,7 @@ const animatePosition = (index: number, currentIndex: number) => {
   }
 
   if (index === currentIndex) {
-    return 'translate-x-0 scale-110 opacity-100'; // Center card
+    return `translate-x-0 scale-${isHighDpiMonitor ? '90' : '110'} opacity-100`; // Center card
   }
 
   if (index === currentIndex + 1 || index === currentIndex - 1) {
@@ -179,7 +181,7 @@ const Carousel: React.FC<CarouselProps> = ({
 
   return (
     <div
-      className="flex justify-center items-center relative flex-1 px-10 min-h-[85vh]"
+      className={`flex justify-center items-center relative flex-1 px-10 mt-16 min-h-[80vh]`}
       ref={carouselRef}
     >
       <ArrowButton
@@ -205,7 +207,7 @@ const Carousel: React.FC<CarouselProps> = ({
                 onTouchStart={onTouchStart}
                 onTouchEnd={(e) => onTouchEnd(e, currentIndex)}
                 className={`
-                  ${animatePosition(index, currentIndex)} 
+                  ${animatePosition(index, currentIndex)}
                   ${animateFirstRender(index, currentIndex, firstRender)}`}
               >
                 {card}

@@ -9,8 +9,8 @@ const Footer = () => {
         <div className="min-w-fit flex-1 p-4">
           <h3 className="font-semibold text-2xl">About Us</h3>
           <p className="text-sm max-w-[65ch]">
-            We are committed to giving pre-loved clothes a second life. Shop sustainably and
-            stylishly with us!
+            We are committed to giving pre-loved clothes a second life. Shop sustainably and stylishly with
+            us!
           </p>
         </div>
 
@@ -21,6 +21,11 @@ const Footer = () => {
             <li>
               <Link className="hover:underline text-sm" to="/products">
                 Products
+              </Link>
+            </li>
+            <li>
+              <Link className="hover:underline text-sm" to="/favorites">
+                Favorites
               </Link>
             </li>
           </ul>
