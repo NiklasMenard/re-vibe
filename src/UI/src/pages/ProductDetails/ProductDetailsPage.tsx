@@ -29,9 +29,9 @@ const ProductDetailsPage: React.FC = () => {
     <div className="flex flex-col ">
       <Header />
       <div className="flex flex-col items-stretch">
-        <div className="flex flex-1 flex-col md:p-10 rounded-lg justify-between mt-16 bg-coral md:bg-vanilla mx-auto">
-          <div className="p-10 rounded bg-coral md:bg-white border-jet relative">
-            <div className="bg-white p-8 relative rounded border border-jet ">
+        <div className="flex flex-1 flex-col md:p-10 justify-between mt-16 bg-coral md:bg-vanilla mx-auto ">
+          <div className="p-10 bg-coral md:bg-white border md:rounded-lg">
+            <div className="bg-white p-8 relative rounded-lg">
               {isAuthenticated && (
                 <FavoriteIcon
                   className="absolute top-0 right-0"
@@ -45,24 +45,23 @@ const ProductDetailsPage: React.FC = () => {
               <img
                 src={product?.bucket_key}
                 alt={product?.name}
-                className="max-w-full mx-auto h-auto object-contain rounded-lg border border-black"
+                width={768}
+                className="w-full max-w-[768px] h-auto mx-auto object-contain rounded-lg border border-black border-solid"
               />
-            </div>
 
-            <div className="">
               <div className="flex justify-between items-center my-8">
-                <h1 className="text-3xl font-bold text-jet">{product?.name}</h1>
+                <p className="text-2xl font-bold text-jet">{product?.name}</p>
                 <p className="text-2xl font-bold text-jet">{product?.price}€</p>
               </div>
 
               <div className="flex gap-6 my-8 flex-wrap">
                 <div className="flex-[2] min-w-fit">
-                  <h2 className="text-xl font-semibold text-jet">Product Description</h2>
-                  <p className="text-viridian mb-2">{product?.description}</p>
+                  <h2 className="text-xl font-semibold text-jet underline">Product Description</h2>
+                  <p className="text-jet mb-2">{product?.description}</p>
                 </div>
 
                 <div className="flex-1 min-w-fit">
-                  <h2 className="text-xl font-semibold text-jet">Specifications</h2>
+                  <h2 className="text-xl font-semibold text-jet underline">Specifications</h2>
                   <ul className="list-disc list-inside text-gray-600">
                     <li>Material: 100% Cotton</li>
                     <li>Dimensions: 10 x 20 x 15 cm</li>
@@ -74,17 +73,15 @@ const ProductDetailsPage: React.FC = () => {
 
               <div className="flex gap-14 my-8 flex-wrap">
                 <div className="flex-[2] min-w-fit">
-                  <h2 className="text-xl font-semibold text-jet">Customer Reviews</h2>
-                  <p className="text-gray-600">
-                    "Amazing product! Exceeded my expectations." – Jane D.
-                  </p>
+                  <h2 className="text-xl font-semibold text-jet underline">Customer Reviews</h2>
+                  <p className="text-gray-600">"Amazing product! Exceeded my expectations." – Jane D.</p>
                   <p className="text-gray-600">
                     "Would definitely buy again. Great value for the price." – Mark T.
                   </p>
                 </div>
 
                 <div className="flex-1 min-w-fit">
-                  <h2 className="text-xl font-semibold text-jet">Seller Information</h2>
+                  <h2 className="text-xl font-semibold text-jet underline">Seller Information</h2>
                   <p className="text-gray-600">
                     Sold by: <span className="font-medium">John's Store</span>
                   </p>
