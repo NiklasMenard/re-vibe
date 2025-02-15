@@ -1,11 +1,9 @@
-import useFavoriteProducts from '@/hooks/useFavoriteProducts';
 import React from 'react';
-import ProductCard from '../Products/ProductCard';
+import useFavoriteProducts from '@/hooks/useFavoriteProducts';
 import { useAuth } from '@/hooks/useAuth';
+import ProductCard from '../Products/ProductCard';
 import ProductImage from '@/components/ProductImage';
 import FavoriteIcon from '@/components/FavoriteIcon';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 
 const FavoriteProductsPage: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -17,8 +15,7 @@ const FavoriteProductsPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-[100vh] overflow-y-auto overflow-x-hidden ">
-      <Header />
+    <>
       <h1 className="text-3xl font-bold text-jet mb-8 pt-28 text-center">
         {loading
           ? null
@@ -47,8 +44,7 @@ const FavoriteProductsPage: React.FC = () => {
             ))
           : null}
       </div>
-      <Footer />
-    </div>
+    </>
   );
 };
 

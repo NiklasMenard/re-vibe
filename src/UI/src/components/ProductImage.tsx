@@ -6,9 +6,15 @@ interface ProductImageProps {
   product: Product;
   width?: string;
   height?: string;
+  className?: string;
 }
 
-const ProductImage: React.FC<ProductImageProps> = ({ product, width = '512', height = '512' }) => {
+const ProductImage: React.FC<ProductImageProps> = ({
+  product,
+  width = '512',
+  height = '512',
+  className,
+}) => {
   const [loaded, setLoaded] = useState(false);
 
   const navigate = useNavigate();
@@ -26,7 +32,7 @@ const ProductImage: React.FC<ProductImageProps> = ({ product, width = '512', hei
       onClick={() => handleCardClick(product.product_id.toString())}
       className={`hover: cursor-pointer max-w-full h-auto object-contain border-2 border-jet transition-opacity duration-50 ease-in ${
         loaded ? 'opacity-100' : 'opacity-0'
-      }`}
+      } ${className}`}
       onLoad={() => setLoaded(true)}
     />
   );

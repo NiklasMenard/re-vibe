@@ -18,13 +18,13 @@ const FavoriteIcon = <T extends { product_id: number }>({
 }: FavoriteIconProps<T>) => {
   const handleLike = () => {
     if (item && likeItem) {
-      likeItem(item); // Call likeItem only if item and likeItem are defined
+      likeItem(item);
     }
   };
 
   const handleUnlike = () => {
     if (item && unlikeItem) {
-      unlikeItem(item); // Call unlikeItem only if item and unlikeItem are defined
+      unlikeItem(item);
     }
   };
 

@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { Pagination } from '../../types/types';
 
-import Header from '../../components/Header';
 import Carousel from '@/components/Carousel';
-import Footer from '../../components/Footer';
 import ProductCard from './ProductCard';
 import useFavoriteProducts from '@/hooks/useFavoriteProducts';
 import useProducts from '@/hooks/useProducts';
@@ -73,42 +71,38 @@ const ProductsPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-[100vh] overflow-y-auto overflow-x-hidden">
-      <Header />
-      <Carousel
-        key={sliceStart}
-        initialIndex={initialIndex}
-        onNextClick={handleNextClick}
-        onPrevClick={handlePrevClick}
-        renderCards={loadedAndNoErrorState}
-        prevButtonText={
-          sliceState === SliceState.Start &&
-          sliceStart !== 0 && <p className="text-white">Previous</p>
-        }
-        nextButtonText={sliceState === SliceState.End && <p className="text-white">Load more</p>}
-      >
-        {displayedProducts.map((product) => (
-          <ProductCard
-            key={product.product_id}
-            product={product}
-            className="max-w-[70vw]"
-            icon={
-              isAuthenticated && (
-                <FavoriteIcon
-                  isLiked={isProductLiked(product)}
-                  item={product}
-                  likeItem={likeProduct}
-                  unlikeItem={unlikeProduct}
-                />
-              )
-            }
-          >
-            <ProductImage product={product} />
-          </ProductCard>
-        ))}
-      </Carousel>
-      <Footer />
-    </div>
+    <Carousel
+      key={sliceStart}
+      initialIndex={initialIndex}
+      onNextClick={handleNextClick}
+      onPrevClick={handlePrevClick}
+      renderCards={loadedAndNoErrorState}
+      prevButtonText={
+        sliceState === SliceState.Start &&
+        sliceStart !== 0 && <p className="text-white">Previous</p>
+      }
+      nextButtonText={sliceState === SliceState.End && <p className="text-white">Load more</p>}
+    >
+      {displayedProducts.map((product) => (
+        <ProductCard
+          key={product.product_id}
+          product={product}
+          className="max-w-[70vw]"
+          icon={
+            isAuthenticated && (
+              <FavoriteIcon
+                isLiked={isProductLiked(product)}
+                item={product}
+                likeItem={likeProduct}
+                unlikeItem={unlikeProduct}
+              />
+            )
+          }
+        >
+          <ProductImage product={product} />
+        </ProductCard>
+      ))}
+    </Carousel>
   );
 };
 

@@ -1,5 +1,3 @@
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 import ImageScroller from '@/components/ImageScroller';
 
 import { Button } from '@/components/Buttons';
@@ -29,60 +27,57 @@ const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-[100dvh] overflow-auto">
-      <Header />
-      <div className="flex-grow grid grid-cols-1 grid-rows-4 pt-[4rem] md:grid-cols-2 md:grid-rows-2">
-        <div className="flex flex-col justify-center  bg-coral md:bg-vanilla p-10 border-b border-b-jet md:border-none">
-          <div className="m-auto max-w-[65ch] ">
-            <h2 className="font-bold mb-4 ">Revive Your Wardrobe with Timeless Classics</h2>
-            <p className="mb-4">
-              Discover curated, pre-loved clothing that not only brings classic style to your
-              wardrobe but also helps reduce waste. Join the movement for sustainable fashion and
-              make a positive impact on the planet — one thrifted piece at a time.
-            </p>
-            <Button onClick={() => navigate('/products')} className="w-full lg:w-[25rem]">
-              Explore
-            </Button>
-          </div>
-        </div>
+    <div className="flex-grow grid grid-cols-1 grid-rows-4 pt-[4rem] md:grid-cols-2 md:grid-rows-2">
+      <div className="flex flex-col justify-center  bg-coral md:bg-vanilla p-10 border-b border-b-jet md:border-none">
+        <div className="m-auto max-w-[65ch] ">
+          <h2 className="font-bold mb-4 ">Revive Your Wardrobe with Timeless Classics</h2>
+          <p className="mb-4">
+            Discover curated, pre-loved clothing that not only brings classic style to your wardrobe
+            but also helps reduce waste. Join the movement for sustainable fashion and make a
+            positive impact on the planet — one thrifted piece at a time.
+          </p>
 
-        <div className="flex bg-vanilla justify-center">
-          <ImageScroller
-            className=" absolute mt-[-8rem] right-0"
-            imagePaths={images_first_column.map(
-              (path) => `${import.meta.env.BASE_URL}image_gallery/${path}`
-            )}
-          />
-
-          <ImageScroller
-            className="absolute"
-            imagePaths={images_second_column.map(
-              (path) => `${import.meta.env.BASE_URL}image_gallery/${path}`
-            )}
-          />
-        </div>
-
-        <div className="flex flex-col justify-center bg-coral p-10 border-t border-t-jet">
-          <div className="m-auto max-w-[65ch]">
-            <h2 className="font-bold mb-4">
-              Discover the Easiest Way to Buy and Sell Products Online
-            </h2>
-            <p>
-              Our platform offers a seamless and secure experience for buying and selling a wide
-              variety of products. With intuitive navigation and secure transactions, you can trust
-              us to provide a user-friendly marketplace for all your needs.
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-col items-center  justify-center bg-vanilla md:bg-coral p-4 border-t lg:border-b border-t-jet">
-          <img
-            src={`${import.meta.env.BASE_URL}hero-image.jpg`}
-            alt="Hero image"
-            className=" fullhd:max-h-[37vh]"
-          />
+          <Button onClick={() => navigate('/products')} className="w-full lg:w-[25rem]">
+            Explore
+          </Button>
         </div>
       </div>
-      <Footer />
+
+      <div className="flex bg-vanilla justify-center">
+        <ImageScroller
+          className=" absolute mt-[-8rem] right-0"
+          imagePaths={images_first_column.map(
+            (path) => `${import.meta.env.BASE_URL}image_gallery/${path}`
+          )}
+        />
+
+        <ImageScroller
+          className="absolute"
+          imagePaths={images_second_column.map(
+            (path) => `${import.meta.env.BASE_URL}image_gallery/${path}`
+          )}
+        />
+      </div>
+
+      <div className="flex flex-col justify-center bg-coral p-10 border-t border-t-jet">
+        <div className="m-auto max-w-[65ch]">
+          <h2 className="font-bold mb-4">
+            Discover the Easiest Way to Buy and Sell Products Online
+          </h2>
+          <p>
+            Our platform offers a seamless and secure experience for buying and selling a wide
+            variety of products. With intuitive navigation and secure transactions, you can trust us
+            to provide a user-friendly marketplace for all your needs.
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-col items-center  justify-center bg-vanilla md:bg-coral p-4 border-t lg:border-b border-t-jet">
+        <img
+          src={`${import.meta.env.BASE_URL}hero-image.jpg`}
+          alt="Hero image"
+          className=" fullhd:max-h-[37vh]"
+        />
+      </div>
     </div>
   );
 };

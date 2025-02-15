@@ -8,19 +8,25 @@ import ProductsPage from './pages/Products/ProductsPage';
 import LoginPage from './pages/Login';
 import ProductDetailsPage from './pages/ProductDetails/ProductDetailsPage';
 import FavoriteProductsPage from './pages/FavoriteProducts/FavoriteProductsPage';
+import Header from './components/Header';
+import Footer from './components/Footer';
 
 const App = () => {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/favorites" element={<FavoriteProductsPage />} />
-          <Route path="/products/:id" element={<ProductDetailsPage />} />
-          <Route path="/login" element={<LoginPage />} />
-        </Routes>
-      </AuthProvider>
+      <div className="flex flex-col min-h-[100dvh] overflow-auto overflow-x-hidden">
+        <AuthProvider>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/favorites" element={<FavoriteProductsPage />} />
+            <Route path="/products/:id" element={<ProductDetailsPage />} />
+            <Route path="/login" element={<LoginPage />} />
+          </Routes>
+        </AuthProvider>
+        <Footer />
+      </div>
     </BrowserRouter>
   );
 };
