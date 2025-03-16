@@ -10,6 +10,7 @@ Welcome to Re-Vibe! This project is designed to showcase a demo website for sell
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+  - [Database Management](#database-management)
 - [Usage](#usage)
 - [Testing](#testing)
 - [Project Structure](#project-structure)
@@ -47,7 +48,7 @@ Before you begin, ensure that the following prerequisites are installed on your 
    cargo build
    ```
 
-4. Create a `.env` file in the project root directory and configure the database connection settings, keys and secrets. You can use the following template:
+4. Create a `.env` file in the project root directory and configure the database connection settings, keys, and secrets. You can use the following template:
 
    ```env
    # Database connection URL. Replace 'username' and 'password' with your PostgreSQL credentials.
@@ -68,12 +69,12 @@ Before you begin, ensure that the following prerequisites are installed on your 
 
    Replace `username` and `password` with your PostgreSQL credentials.
 
-5. Create a `.env.development` file in the project src/UI directory to create a local Vite API URL reference for your server API, you can use the following template
+5. Create a `.env.development` file in the project `src/UI` directory to create a local Vite API URL reference for your server API. You can use the following template:
 
-```env
+   ```env
    # Base URL for API requests. Replace with your server's URL and port.
    VITE_API_BASE_URL=http://localhost:8000
-```
+   ```
 
 6. Set up the database schema and run initial migrations using Diesel:
 
@@ -82,12 +83,36 @@ Before you begin, ensure that the following prerequisites are installed on your 
    diesel migration run
    ```
 
+### Database Management
+
+If you need to reset the database (drop all tables and re-run migrations), follow these steps:
+
+1. Drop the existing database:
+
+   ```bash
+   diesel database reset
+   ```
+
+   This will drop and recreate the database.
+
+2. Re-run migrations:
+
+   ```bash
+   diesel migration run
+   ```
+
+3. (Optional) Seed the database with product data and bucket keys that reference images in the Digital Ocean bucket:
+
+   ```bash
+   cargo run --bin seeder
+   ```
+
 ## Usage
 
 To launch the Re-Vibe server, execute the following command in the project directory:
 
 ```bash
-cargo run
+cargo run --bin main
 ```
 
 The server will start and listen on the specified port. You can interact with the website and its API using your web browser or an API client.
