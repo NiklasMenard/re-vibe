@@ -1,5 +1,4 @@
-use chrono::Utc;
-use diesel::{ExpressionMethods, RunQueryDsl};
+use diesel::RunQueryDsl;
 use domain::models::{NewProduct, Product};
 
 use infrastructure::database::connection::establish_connection;
@@ -21,12 +20,12 @@ pub async fn post_product(product: Json<NewProduct>) -> Result<String, Status> {
         seller_id: new_data.seller_id,
         category_id: new_data.category_id,
         bucket_key: new_data.bucket_key,
+        creation_date: chrono::Utc::now().naive_utc(),
     };
 
     match diesel::insert_into(products::table)
         .values((
             &new_product_data,
-            products::creation_date.eq(Utc::now().naive_utc()),
         ))
         .get_result::<Product>(connection)
     {

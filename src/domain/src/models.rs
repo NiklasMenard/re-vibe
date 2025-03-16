@@ -128,6 +128,7 @@ pub struct NewProduct {
     pub seller_id: Uuid,
     pub category_id: i32,
     pub bucket_key: String,
+    pub creation_date: NaiveDateTime,
 }
 
 // Struct for the Tags table
