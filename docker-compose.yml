@@ -5,8 +5,9 @@ services:
     environment:
       DATABASE_URL: 'postgres://postgres:${POSTGRES_PASSWORD}@db:5432'
       JWT_SECRET: '${JWT_SECRET}'
-      DIGITAL_OCEAN_ACCESS_KEY: '${DIGITAL_OCEAN_ACCESS_KEY}'
-      DIGITAL_SECRET_ACCESS_KEY: '${DIGITAL_SECRET_ACCESS_KEY}'
+      BUCKET_SECRET_ACCESS_KEY: '${BUCKET_SECRET_ACCESS_KEY}'
+      BUCKET_ACCESS_KEY: '${BUCKET_ACCESS_KEY}'
+      BUCKET_ENDPOINT_URL: '${BUCKET_ENDPOINT_URL}'
     build:
       context: .
       dockerfile: Dockerfile

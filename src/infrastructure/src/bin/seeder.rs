@@ -31,7 +31,7 @@
 
         let connection = &mut establish_connection();
         let current_dir = env::current_dir()?;
-        let csv_path = current_dir.join("infrastructure/src/bin/bucket_keys.csv");
+        let csv_path = current_dir.join("src/infrastructure/src/bin/bucket_keys.csv");
         let bucket_keys = read_products_from_csv(csv_path.to_str().expect("Invalid UTF-8 in path"))?;
 
         let categories = vec![1, 2, 3, 4];

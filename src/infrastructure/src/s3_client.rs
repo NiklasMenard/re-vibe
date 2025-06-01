@@ -6,27 +6,28 @@ use std::error::Error;
 use std::time::Duration;
 
 pub async fn create_client() -> Result<Client, Box<dyn Error>> {
-    let access_key_id = std::env::var("DIGITAL_OCEAN_ACCESS_KEY")?;
-    let secret_access_key = std::env::var("DIGITAL_SECRET_ACCESS_KEY")?;
+    let access_key_id = std::env::var("BUCKET_ACCESS_KEY")?;
+    let secret_access_key = std::env::var("BUCKET_SECRET_ACCESS_KEY")?;
+    let endpoint_url =  std::env::var("BUCKET_ENDPOINT_URL")?;
 
-    // Set up region provider chain with DigitalOcean Spaces region
-    let region_provider = RegionProviderChain::first_try(Some(Region::new("fra1")))
+    // Set up region provider chain with bucket region
+    let region_provider = RegionProviderChain::first_try(Some(Region::new("EUROPE-2")))
         .or_default_provider()
-        .or_else(Region::new("fra1"));
+        .or_else(Region::new("EUROPE-2"));
 
     let creds = Credentials::new(
         access_key_id,
         secret_access_key,
         None,
         None,
-        "DigitalOceanSpaces",
+        "",
     );
 
     // Load shared config with updated function and BehaviorVersion argument
     let shared_config = aws_config::defaults(aws_config::BehaviorVersion::v2024_03_28())
         .region(region_provider)
         .credentials_provider(creds)
-        .endpoint_url("https://fra1.digitaloceanspaces.com")
+        .endpoint_url(endpoint_url)
         .load()
         .await;
 

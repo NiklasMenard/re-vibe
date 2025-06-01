@@ -1,5 +1,5 @@
 # Build Stage for Rust Backend
-FROM rust:1.81.0 as chef
+FROM rust:1.82.0 as chef
 
 # Install cargo-chef to manage dependencies
 RUN cargo install --locked cargo-chef

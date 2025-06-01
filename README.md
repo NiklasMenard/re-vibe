@@ -60,11 +60,11 @@ Before you begin, ensure that the following prerequisites are installed on your 
    # Secret key used to sign and verify JSON Web Tokens (JWT). Should be a strong, secret string.
    JWT_SECRET=jwtsecret
 
-   # DigitalOcean Access Key for authenticating API requests to DigitalOcean services.
-   DIGITAL_OCEAN_ACCESS_KEY=key
+   # Storage Bucket Access Key for authenticating API requests to Storage Bucket services.
+   BUCKET_SECRET_ACCESS_KEY=key
 
-   # DigitalOcean Secret Access Key for authenticating API requests to DigitalOcean services.
-   DIGITAL_SECRET_ACCESS_KEY=key
+   # Storage Bucket Secret Access Key for authenticating API requests to Storage Bucket services.
+   BUCKET_SECRET_ACCESS_KEY=key
    ```
 
    Replace `username` and `password` with your PostgreSQL credentials.
