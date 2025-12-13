@@ -1,7 +1,9 @@
 use chrono::Utc;
+use infrastructure::database::connection::DbPool;
 use rocket::http::{Cookie, CookieJar, SameSite, Status};
 use rocket::post;
 use rocket::serde::json::{json, Json};
+use rocket::State;
 use serde_json::Value;
 
 use hmac::{Hmac, Mac};
@@ -80,14 +82,15 @@ fn generate_refresh_cookie(token: String) -> Cookie<'static> {
 }
 
 #[post("/login", data = "<credentials>")]
-pub fn login_handler(
+pub async fn login_handler(
+    pool: &State<DbPool>,
     credentials: Json<Credentials>,
     cookies: &CookieJar<'_>,
 ) -> Result<Json<Value>, Status> {
     let email = credentials.email.to_string();
     let password = credentials.password.to_string();
 
-    match login::check_email_password(email, password) {
+    match login::check_email_password(pool.inner(), email, password).await {
         None => Err(Status::Unauthorized),
         Some(user) => {
             let (access_token, refresh_token) = generate_tokens(
