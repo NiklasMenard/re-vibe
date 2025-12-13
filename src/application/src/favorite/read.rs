@@ -1,4 +1,5 @@
 use diesel::prelude::*;
+use diesel_async::RunQueryDsl;
 use domain::{
     models::Product,
     schema::{
@@ -7,15 +8,15 @@ use domain::{
     },
 };
 use infrastructure::{
-    database::connection::establish_connection,
+    database::connection::DbPool,
     s3_client::{create_client, generate_presigned_url},
 };
 use rocket::http::Status;
 use shared::response_models::{Response, ResponseBody};
 use uuid::Uuid;
 
-pub async fn list_favorite_products(user_id: Uuid) -> Result<String, Status> {
-    let connect = &mut establish_connection();
+pub async fn list_favorite_products(pool: &DbPool, user_id: Uuid) -> Result<String, Status> {
+    let mut connect = pool.get().await.map_err(|_| Status::InternalServerError)?;
 
     let products = user_favorite_products::table
         .inner_join(users::table.on(user_favorite_products::user_id.eq(users::id)))
@@ -32,7 +33,8 @@ pub async fn list_favorite_products(user_id: Uuid) -> Result<String, Status> {
             products::creation_date,
             products::bucket_key,
         ))
-        .load::<Product>(connect)
+        .load::<Product>(&mut connect)
+        .await
         .map_err(|err| {
             eprintln!("Database error - {}", err);
             Status::InternalServerError
