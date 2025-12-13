@@ -1,12 +1,13 @@
 use diesel::prelude::*;
+use diesel_async::RunQueryDsl;
 use domain::{
     models::{Role, User, UserRole},
     schema::{roles, user_roles, users},
 };
-use infrastructure::database::connection::establish_connection;
+use infrastructure::database::connection::DbPool;
 
-pub fn check_email_password(email: String, password: String) -> Option<UserRole> {
-    let connection = &mut establish_connection();
+pub async fn check_email_password(pool: &DbPool, email: String, password: String) -> Option<UserRole> {
+    let mut connection = pool.get().await.ok()?;
 
     // Use manual join conditions to get user info and associated role
     match users::table
@@ -17,7 +18,8 @@ pub fn check_email_password(email: String, password: String) -> Option<UserRole>
                 .inner_join(roles::table.on(user_roles::role_id.eq(roles::role_id))),
         )
         .select((users::all_columns, roles::all_columns))
-        .first::<(User, Role)>(connection)
+        .first::<(User, Role)>(&mut connection)
+        .await
     {
         Ok((user, role)) => {
             let hash = User::hash_with_salt(&password, &user.salt);
