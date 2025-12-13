@@ -1,10 +1,11 @@
 use diesel::{dsl::count_star, prelude::*};
+use diesel_async::RunQueryDsl;
 use domain::{
     models::{PaginatedProducts, Product},
     schema::products,
 };
 use infrastructure::{
-    database::connection::establish_connection,
+    database::connection::DbPool,
     s3_client::{create_client, generate_presigned_url},
 };
 use rocket::{http::Status, serde::json::Json};
@@ -14,11 +15,12 @@ use shared::{
 };
 
 pub async fn list_products(
+    pool: &DbPool,
     page: Option<i64>,
     page_size: Option<i64>,
     filter: Option<Json<ProductFilter>>,
 ) -> Result<String, Status> {
-    let connect = &mut establish_connection();
+    let mut connect = pool.get().await.map_err(|_| Status::InternalServerError)?;
 
     let mut query = products::table.select(products::all_columns).into_boxed();
 
@@ -26,7 +28,7 @@ pub async fn list_products(
         query = query.filter(products::name.like(format!("%{}%", filter_json.into_inner().name)));
     }
 
-    let total_count: i64 = match products::table.select(count_star()).first(connect) {
+    let total_count: i64 = match products::table.select(count_star()).first(&mut connect).await {
         Ok(result) => result,
         Err(err) => {
             eprintln!("Database error - {}", err);
@@ -43,7 +45,8 @@ pub async fn list_products(
     let products = query
         .limit(page_size)
         .offset(offset)
-        .load::<Product>(connect)
+        .load::<Product>(&mut connect)
+        .await
         .map_err(|err| {
             eprintln!("Database error - {}", err);
             Status::InternalServerError
@@ -102,10 +105,10 @@ pub async fn list_products(
     Ok(serde_json::to_string(&response).unwrap())
 }
 
-pub async fn list_product(product_id: i32) -> Result<String, Status> {
-    let connect = &mut establish_connection();
+pub async fn list_product(pool: &DbPool, product_id: i32) -> Result<String, Status> {
+    let mut connect = pool.get().await.map_err(|_| Status::InternalServerError)?;
 
-    let product = match products::table.find(product_id).first::<Product>(connect) {
+    let product = match products::table.find(product_id).first::<Product>(&mut connect).await {
         Ok(product) => {
             let client = create_client().await.unwrap();
 

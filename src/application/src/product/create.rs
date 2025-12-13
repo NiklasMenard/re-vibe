@@ -1,16 +1,16 @@
-use diesel::RunQueryDsl;
+use diesel_async::RunQueryDsl;
 use domain::models::{NewProduct, Product};
 
-use infrastructure::database::connection::establish_connection;
+use infrastructure::database::connection::DbPool;
 use rocket::http::Status;
 use rocket::serde::json::Json;
 use shared::response_models::{Response, ResponseBody};
 
-pub async fn post_product(product: Json<NewProduct>) -> Result<String, Status> {
+pub async fn post_product(pool: &DbPool, product: Json<NewProduct>) -> Result<String, Status> {
     use domain::schema::products;
 
     let new_data = product.into_inner();
-    let connection = &mut establish_connection();
+    let mut connection = pool.get().await.map_err(|_| Status::InternalServerError)?;
 
     let new_product_data = NewProduct {
         name: new_data.name,
@@ -27,7 +27,8 @@ pub async fn post_product(product: Json<NewProduct>) -> Result<String, Status> {
         .values((
             &new_product_data,
         ))
-        .get_result::<Product>(connection)
+        .get_result::<Product>(&mut connection)
+        .await
     {
         Ok(_) => {
             let response = Response {

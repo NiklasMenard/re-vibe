@@ -1,14 +1,16 @@
 use diesel::prelude::*;
+use diesel_async::RunQueryDsl;
 use domain::{models::Product, schema::products};
-use infrastructure::database::connection::establish_connection;
+use infrastructure::database::connection::DbPool;
 use rocket::http::Status;
 use shared::response_models::{Response, ResponseBody};
 
-pub async fn delete_product(id: i32) -> Result<String, Status> {
-    let connect = &mut establish_connection();
+pub async fn delete_product(pool: &DbPool, id: i32) -> Result<String, Status> {
+    let mut connect = pool.get().await.map_err(|_| Status::InternalServerError)?;
 
     let num_deleted = match diesel::delete(products::table.filter(products::product_id.eq(id)))
-        .execute(connect)
+        .execute(&mut connect)
+        .await
     {
         Ok(count) => count,
         Err(err) => match err {
@@ -24,7 +26,8 @@ pub async fn delete_product(id: i32) -> Result<String, Status> {
 
     if num_deleted > 0 {
         match products::table
-            .load::<Product>(connect) // Use the existing connection
+            .load::<Product>(&mut connect)
+            .await
         {
             Ok(products_) => {
                 let response = Response {
