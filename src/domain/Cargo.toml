@@ -12,8 +12,8 @@ diesel = { version = "2.0.0", features = [
     "chrono",
     "uuid",
     "numeric",
-    "bigdecimal",
 ] }
+diesel-async = { version = "0.4", features = ["postgres"] }
 
 serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
