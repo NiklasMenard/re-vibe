@@ -8,24 +8,21 @@ use infrastructure::{
     database::connection::DbPool,
     s3_client::{create_client, generate_presigned_url},
 };
-use rocket::{http::Status, serde::json::Json};
-use shared::{
-    request_models::ProductFilter,
-    response_models::{Response, ResponseBody},
-};
+use rocket::http::Status;
+use shared::response_models::{Response, ResponseBody};
 
 pub async fn list_products(
     pool: &DbPool,
     page: Option<i64>,
     page_size: Option<i64>,
-    filter: Option<Json<ProductFilter>>,
+    name: Option<String>,
 ) -> Result<String, Status> {
     let mut connect = pool.get().await.map_err(|_| Status::InternalServerError)?;
 
     let mut query = products::table.select(products::all_columns).into_boxed();
 
-    if let Some(filter_json) = filter {
-        query = query.filter(products::name.like(format!("%{}%", filter_json.into_inner().name)));
+    if let Some(filter_name) = name {
+        query = query.filter(products::name.like(format!("%{}%", filter_name)));
     }
 
     let total_count: i64 = match products::table.select(count_star()).first(&mut connect).await {

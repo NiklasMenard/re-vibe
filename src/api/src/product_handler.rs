@@ -3,23 +3,21 @@ use domain::models::NewProduct;
 use infrastructure::auth::UserApiKey;
 use infrastructure::database::connection::DbPool;
 use rocket::http::Status;
-use shared::request_models::ProductFilter;
 
 use rocket::serde::json::Json;
 use rocket::{delete, get, post, put, State};
 
 #[get(
-    "/products?<page>&<page_size>",
-    format = "application/json",
-    data = "<filter>"
+    "/products?<page>&<page_size>&<name>",
+    format = "application/json"
 )]
 pub async fn list_products_handler(
     pool: &State<DbPool>,
     page: Option<i64>,
     page_size: Option<i64>,
-    filter: Option<Json<ProductFilter>>,
+    name: Option<String>,
 ) -> Result<String, Status> {
-    read::list_products(pool.inner(), page, page_size, filter).await
+    read::list_products(pool.inner(), page, page_size, name).await
 }
 
 #[get("/products/<product_id>")]
