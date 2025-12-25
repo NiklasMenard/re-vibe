@@ -24,7 +24,7 @@ pub async fn create_client() -> Result<Client, Box<dyn Error>> {
     );
 
     // Load shared config with updated function and BehaviorVersion argument
-    let shared_config = aws_config::defaults(aws_config::BehaviorVersion::v2024_03_28())
+    let shared_config = aws_config::defaults(aws_config::BehaviorVersion::v2025_08_07())
         .region(region_provider)
         .credentials_provider(creds)
         .endpoint_url(endpoint_url)
