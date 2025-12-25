@@ -119,7 +119,142 @@ The server will start and listen on the specified port. You can interact with th
 
 ## Testing
 
-For testing, you can use the provided `API_TEST.http` file to send test requests. You may use the VSCode Rest Client plugin for this purpose.
+The project includes comprehensive unit and integration tests for all crates. Tests use a separate PostgreSQL test database managed via Docker Compose.
+
+### Quick Start - Automated Test Runner
+
+The easiest way to run all tests is using the provided test runner script:
+
+```bash
+./run_tests.sh
+```
+
+This script automatically:
+1. Creates `.env.test` if it doesn't exist
+2. Starts the test database with Docker Compose
+3. Waits for the database to be ready
+4. Runs database migrations
+5. Executes all tests
+6. Cleans up (stops database and removes volumes)
+
+### Manual Test Setup
+
+If you prefer to run tests manually:
+
+1. **Create test environment file:**
+
+   Copy the example environment configuration:
+   ```bash
+   cp env.test.example .env.test
+   ```
+
+   The `.env.test` file should contain:
+   ```env
+   DATABASE_URL=postgres://postgres:testpassword@localhost:5434/re_vibe_test
+   POSTGRES_PASSWORD=testpassword
+   JWT_SECRET=test_jwt_secret_for_testing_only
+   BUCKET_ACCESS_KEY=test_access_key
+   BUCKET_SECRET_ACCESS_KEY=test_secret_key
+   BUCKET_ENDPOINT_URL=https://mock-s3-endpoint.com
+   ```
+
+2. **Start the test database:**
+
+   ```bash
+   docker-compose -f docker-compose.test.yml up -d
+   ```
+
+   This starts a PostgreSQL test database on port 5434 (separate from the development database on port 5433).
+
+3. **Run database migrations on test database:**
+
+   ```bash
+   DATABASE_URL=postgres://postgres:testpassword@localhost:5434/re_vibe_test diesel migration run
+   ```
+
+### Running Tests
+
+**Run all tests across the entire workspace:**
+
+```bash
+cargo test --workspace
+```
+
+**Run tests for a specific crate:**
+
+```bash
+# Domain tests (model logic, no database required)
+cargo test -p domain
+
+# Infrastructure tests (validation, auth)
+cargo test -p infrastructure
+
+# Application tests (business logic with database)
+cargo test -p application
+
+# API tests (HTTP handlers with Rocket)
+cargo test -p api
+```
+
+**Run tests with output:**
+
+```bash
+cargo test --workspace -- --nocapture
+```
+
+**Run tests sequentially (recommended for database tests):**
+
+```bash
+cargo test --workspace -- --test-threads=1
+```
+
+### Test Coverage
+
+- **Domain (`src/domain/tests/`)**: Model validation, password hashing
+- **Infrastructure (`src/infrastructure/tests/`)**: Validation logic, JWT authentication
+- **Application (`src/application/tests/`)**: User registration/login, product operations
+- **API (`src/api/tests/`)**: HTTP endpoint testing with Rocket
+
+### Stopping Test Database
+
+When finished testing manually:
+
+```bash
+docker-compose -f docker-compose.test.yml down
+```
+
+To remove test data volumes:
+
+```bash
+docker-compose -f docker-compose.test.yml down -v
+```
+
+### Continuous Integration
+
+For CI/CD pipelines, use the test runner script:
+
+```bash
+./run_tests.sh
+```
+
+Or manually:
+
+```bash
+# Start test database
+docker-compose -f docker-compose.test.yml up -d
+
+# Wait for database to be ready
+sleep 5
+
+# Run migrations
+DATABASE_URL=postgres://postgres:testpassword@localhost:5434/re_vibe_test diesel migration run
+
+# Run tests
+cargo test --workspace -- --test-threads=1
+
+# Cleanup
+docker-compose -f docker-compose.test.yml down -v
+```
 
 ## Project Structure
 
