@@ -1,4 +1,3 @@
-use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 use domain::{
     models::{NewUser, NewUserRole, User},

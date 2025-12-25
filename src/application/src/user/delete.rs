@@ -1,4 +1,4 @@
-use diesel::prelude::*;
+
 use diesel::QueryDsl;
 use diesel_async::RunQueryDsl;
 use domain::schema::users;
