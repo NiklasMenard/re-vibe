@@ -9,7 +9,8 @@ help:
 	@echo "============================"
 	@echo ""
 	@echo "Setup & Installation:"
-	@echo "  make install       - Install all dependencies (Rust, diesel CLI, etc.)"
+	@echo "  make install       - Install all dependencies (Rust, diesel CLI, Git hooks, etc.)"
+	@echo "  make install-hooks - Install Git hooks (pre-commit clippy check)"
 	@echo ""
 	@echo "Development:"
 	@echo "  make dev           - Start database and run the application locally"
@@ -49,7 +50,16 @@ install:
 	@echo "✓ Docker is installed"
 	@test -f .env || (echo "⚠️  .env file not found. Please create one." && exit 1)
 	@echo "✓ .env file exists"
+	@$(MAKE) install-hooks
 	@echo "✅ All dependencies installed!"
+
+# Install Git hooks
+install-hooks:
+	@echo "🔗 Installing Git hooks..."
+	@mkdir -p .git/hooks
+	@cp hooks/pre-commit .git/hooks/pre-commit
+	@chmod +x .git/hooks/pre-commit
+	@echo "✓ Pre-commit hook installed (runs clippy before commits)"
 
 # Start database and run application locally
 dev:
