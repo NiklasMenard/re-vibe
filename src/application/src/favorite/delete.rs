@@ -1,17 +1,19 @@
 use diesel::prelude::*;
+use diesel_async::RunQueryDsl;
 use domain::{models::UserFavoriteProduct, schema::user_favorite_products};
-use infrastructure::database::connection::establish_connection;
+use infrastructure::database::connection::DbPool;
 use rocket::http::Status;
 use shared::response_models::{Response, ResponseBody};
 
-pub async fn unfavorite_product(id: i32) -> Result<String, Status> {
-    let connect = &mut establish_connection();
+pub async fn unfavorite_product(pool: &DbPool, id: i32) -> Result<String, Status> {
+    let mut connect = pool.get().await.map_err(|_| Status::InternalServerError)?;
 
     // Attempt to delete the product
     let num_deleted = match diesel::delete(
         user_favorite_products::table.filter(user_favorite_products::product_id.eq(id)),
     )
-    .execute(connect)
+    .execute(&mut connect)
+    .await
     {
         Ok(count) => count,
         Err(err) => match err {
@@ -19,7 +21,7 @@ pub async fn unfavorite_product(id: i32) -> Result<String, Status> {
                 return Err(Status::NotFound);
             }
             _ => {
-                eprintln!("Database error - {}", err);
+                eprintln!("Database error - {err}");
                 return Err(Status::InternalServerError);
             }
         },
@@ -27,7 +29,10 @@ pub async fn unfavorite_product(id: i32) -> Result<String, Status> {
 
     // If product deletion was successful (at least one row deleted)
     if num_deleted > 0 {
-        match user_favorite_products::table.load::<UserFavoriteProduct>(connect) {
+        match user_favorite_products::table
+            .load::<UserFavoriteProduct>(&mut connect)
+            .await
+        {
             Ok(products) => {
                 if !products.is_empty() {
                     let response = Response {
@@ -45,8 +50,8 @@ pub async fn unfavorite_product(id: i32) -> Result<String, Status> {
                 }
             }
             Err(err) => {
-                eprintln!("Database error - {}", err);
-                return Err(Status::InternalServerError);
+                eprintln!("Database error - {err}");
+                Err(Status::InternalServerError)
             }
         }
     } else {

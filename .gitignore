@@ -30,6 +30,7 @@ dist-ssr
 
 # Env
 .env*
+.secret
 
 #ignore bucket helper files and folders
 /bucket

@@ -1,0 +1,97 @@
+name: CI - Tests
+
+on:
+  push:
+    branches:
+      - '**'  # Run on all branches
+  pull_request:
+    branches:
+      - '**'
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15.2-alpine
+        env:
+          POSTGRES_DB: re_vibe_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: testpassword
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.88.0
+          components: rustfmt, clippy
+
+      - name: Install PostgreSQL client (for diesel CLI)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpq-dev postgresql-client
+
+      - name: Install diesel CLI
+        run: |
+          cargo install diesel_cli --no-default-features --features postgres --locked || true
+          # Use || true to avoid failure if already cached
+
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5434 -U postgres; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: postgres://postgres:testpassword@localhost:5434/re_vibe_test
+        run: |
+          diesel migration run
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgres://postgres:testpassword@localhost:5434/re_vibe_test
+          POSTGRES_PASSWORD: testpassword
+          JWT_SECRET: test_jwt_secret_for_ci
+          BUCKET_ACCESS_KEY: test_access_key
+          BUCKET_SECRET_ACCESS_KEY: test_secret_key
+          BUCKET_ENDPOINT_URL: https://mock-s3-endpoint.com
+        run: |
+          cargo test --workspace -- --test-threads=1
+
+      - name: Run clippy
+        run: |
+          cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Check formatting
+        run: |
+          cargo fmt --all -- --check

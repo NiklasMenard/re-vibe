@@ -17,7 +17,7 @@ use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 type DB = diesel::pg::Pg;
 
-use infrastructure::database::connection::establish_connection;
+use infrastructure::database::connection::get_pool;
 
 pub struct CORS;
 
@@ -32,7 +32,7 @@ impl Fairing for CORS {
 
     async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
         // Define allowed origins
-        let allowed_origins = vec![
+        let allowed_origins = [
             "http://localhost:3000",
             "http://localhost:8000",
             "http://127.0.0.1:3000",
@@ -86,11 +86,24 @@ pub fn run_db_migrations(conn: &mut impl MigrationHarness<DB>) {
 
 #[launch]
 fn rocket() -> _ {
-    let connection = &mut establish_connection();
+    // Note: Migrations still need synchronous connection
+    // We'll keep the old establish_connection for migrations only
+    use diesel::prelude::*;
+    use dotenvy::dotenv;
+    use std::env;
 
-    run_db_migrations(connection);
+    dotenv().ok();
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
+    let mut migration_conn = diesel::pg::PgConnection::establish(&database_url)
+        .expect("Error connecting to database for migrations");
+
+    run_db_migrations(&mut migration_conn);
+
+    // Initialize async connection pool
+    let pool = get_pool();
 
     rocket::build()
+        .manage(pool)
         .attach(CORS)
         .register(
             "/",

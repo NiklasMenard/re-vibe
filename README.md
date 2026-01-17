@@ -1,157 +1,179 @@
-# Re-Vibe: Clothing Demo Website
+# Re-Vibe
 
-## Project Overview
+A demo marketplace for selling used clothing, built with Rust (Rocket, Diesel) and PostgreSQL.
 
-Welcome to Re-Vibe! This project is designed to showcase a demo website for selling used clothing and potentially other items in the future. The aim is to create a platform where users can list, browse, and purchase second-hand clothes. As I develop the project, I plan to incorporate additional features and enhancements to improve the user experience and expand functionality. This project utilizes Rust for the backend, along with the Rocket, Diesel ORM and PostgreSQL for robust data management.
-
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Database Management](#database-management)
-- [Usage](#usage)
-- [Testing](#testing)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [Future Improvements](#future-improvements)
-- [License](#license)
-
-## Getting Started
-
-### Prerequisites
-
-Before you begin, ensure that the following prerequisites are installed on your system:
-
-- [Rust](https://www.rust-lang.org/tools/install) (including Cargo)
-- [Diesel CLI](http://diesel.rs/guides/getting-started/) for managing database schema and migrations
-- [PostgreSQL](https://www.postgresql.org/download/) database server
-
-### Installation
-
-1. Clone this repository to your local machine:
-
-   ```bash
-   git clone https://github.com/your-username/re-vibe.git
-   ```
-
-2. Navigate to the project directory:
-
-   ```bash
-   cd re-vibe
-   ```
-
-3. Install project dependencies using Cargo:
-
-   ```bash
-   cargo build
-   ```
-
-4. Create a `.env` file in the project root directory and configure the database connection settings, keys, and secrets. You can use the following template:
-
-   ```env
-   # Database connection URL. Replace 'username' and 'password' with your PostgreSQL credentials.
-   DATABASE_URL=postgres://username:password@localhost/re-vibe
-
-   # PostgreSQL password for the user specified in DATABASE_URL.
-   POSTGRES_PASSWORD=postgrespw
-
-   # Secret key used to sign and verify JSON Web Tokens (JWT). Should be a strong, secret string.
-   JWT_SECRET=jwtsecret
-
-   # Storage Bucket Access Key for authenticating API requests to Storage Bucket services.
-   BUCKET_SECRET_ACCESS_KEY=key
-
-   # Storage Bucket Secret Access Key for authenticating API requests to Storage Bucket services.
-   BUCKET_SECRET_ACCESS_KEY=key
-   ```
-
-   Replace `username` and `password` with your PostgreSQL credentials.
-
-5. Create a `.env.development` file in the project `src/UI` directory to create a local Vite API URL reference for your server API. You can use the following template:
-
-   ```env
-   # Base URL for API requests. Replace with your server's URL and port.
-   VITE_API_BASE_URL=http://localhost:8000
-   ```
-
-6. Set up the database schema and run initial migrations using Diesel:
-
-   ```bash
-   diesel setup
-   diesel migration run
-   ```
-
-### Database Management
-
-If you need to reset the database (drop all tables and re-run migrations), follow these steps:
-
-1. Drop the existing database:
-
-   ```bash
-   diesel database reset
-   ```
-
-   This will drop and recreate the database.
-
-2. Re-run migrations:
-
-   ```bash
-   diesel migration run
-   ```
-
-3. (Optional) Seed the database with product data and bucket keys that reference images in the Digital Ocean bucket:
-
-   ```bash
-   cargo run --bin seeder
-   ```
-
-## Usage
-
-To launch the Re-Vibe server, execute the following command in the project directory:
+## Quick Start
 
 ```bash
-cargo run --bin main
+make install    # One-time setup
+make dev        # Start app (http://localhost:8000)
+make test       # Run tests
 ```
 
-The server will start and listen on the specified port. You can interact with the website and its API using your web browser or an API client.
+## Prerequisites
+
+- [Rust](https://rustup.rs) 1.88.0 (auto-installed via `rust-toolchain.toml`)
+- [Docker](https://docker.com) & Docker Compose
+- Make (pre-installed on macOS/Linux)
+
+## Development
+
+### Common Commands
+
+```bash
+make help         # Show all commands
+make dev          # Start database + run app
+make test         # Run all tests
+make test-watch   # Auto-rerun tests on changes
+make db-reset     # Fresh database
+make lint         # Run clippy
+make fmt          # Format code
+```
+
+### VS Code Setup
+
+**Enable clippy warnings + auto-format on save:**
+
+1. Install `rust-analyzer` extension
+2. Add to settings (`Cmd+Shift+P` → "Open User Settings (JSON)"):
+
+```json
+{
+  "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.check.extraArgs": ["--all-targets", "--all-features", "--", "-D", "warnings"],
+  "rust-analyzer.checkOnSave": true,
+  "[rust]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  }
+}
+```
+
+3. Restart rust-analyzer: `Cmd+Shift+P` → "rust-analyzer: Restart server"
+
+**Benefits:** Red squiggles for warnings, auto-format on save, quick fixes
+
+### Environment Variables
+
+Create `.env` in project root:
+
+```env
+DATABASE_URL=postgres://postgres:yourpassword@localhost:5433/postgres
+POSTGRES_PASSWORD=yourpassword
+JWT_SECRET=your-secret-key
+BUCKET_ACCESS_KEY=your-access-key
+BUCKET_SECRET_ACCESS_KEY=your-secret-key
+BUCKET_ENDPOINT_URL=https://your-endpoint-url
+```
 
 ## Testing
 
-For testing, you can use the provided `API_TEST.http` file to send test requests. You may use the VSCode Rest Client plugin for this purpose.
+### Run Tests
+
+```bash
+make test              # All tests
+make test-watch        # Watch mode
+./run_tests.sh         # Using script
+```
+
+### Test CI Locally
+
+```bash
+brew install act       # Install act (macOS)
+make ci-local          # Test GitHub Actions locally
+```
+
+## Database
+
+```bash
+make db-up             # Start PostgreSQL
+make db-down           # Stop database
+make db-reset          # Drop, recreate, migrate
+make migrate           # Run migrations
+make seed              # Add sample data
+```
+
+**Manual:**
+```bash
+diesel migration generate migration_name  # Create migration
+diesel migration run                      # Apply migrations
+diesel migration revert                   # Rollback
+```
 
 ## Project Structure
 
-The project employs a modular structure for better organization:
+```
+re-vibe/
+├── src/
+│   ├── api/            # Rocket endpoints
+│   ├── application/    # Business logic
+│   ├── domain/         # Models & schema
+│   ├── infrastructure/ # Database, S3
+│   ├── shared/         # Utilities
+│   └── UI/             # Frontend (Vite)
+├── migrations/         # Database migrations
+├── Makefile            # Development commands
+└── hooks/              # Git hooks (pre-commit)
+```
 
-- `api/`: Contains the API entry point.
-- `application/`: Handles application-level logic.
-- `domain/`: Houses the core domain logic.
-- `infrastructure/`: Manages database interactions and external services.
-- `shared/`: Provides shared utilities and common functionalities.
+## CI/CD
 
-Each component contains its own `Cargo.toml` file, allowing for independent development and testing.
+- **CI Tests** (`.github/workflows/ci.yml`): Runs on every push/PR
+  - Clippy linting
+  - Code formatting check
+  - All tests
+
+- **Production** (`.github/workflows/prod.yml`): Runs on push/PR to `main`
+  - Build Docker image
+  - Deploy to server
+
+**Pre-commit Hook:** Automatically formats code and runs clippy before every commit.
+
+## Troubleshooting
+
+**Diesel CLI fails to install:**
+```bash
+# macOS
+brew install postgresql
+
+# Ubuntu/Debian
+sudo apt-get install libpq-dev
+```
+
+**Database connection fails:**
+- Check Docker is running: `docker ps`
+- Verify port (5433 for dev, 5434 for test)
+- Check `.env` file
+
+**Rust version mismatch:**
+```bash
+rustup update
+rustc --version  # Should show 1.88.0
+```
+
+## Performance Tips
+
+- First build is slow (~2-3 min) - subsequent builds are fast (5-10s)
+- Keep `target/` directory (don't delete - it's your build cache)
+- Use `make test-watch` for TDD workflow
+- Incremental compilation is enabled by default
+
+## Docker (Alternative)
+
+```bash
+make docker-build     # Build image
+make docker-up        # Start containers
+make docker-down      # Stop containers
+make docker-clean     # Remove all Docker resources
+```
 
 ## Contributing
 
-Contributions to this project are encouraged! If you have ideas, bug reports, or enhancements, please open an issue or submit a pull request.
-
-## Future Improvements
-
-In the future, we plan to enhance the project with features such as:
-
-- User authentication and account management
-- Advanced search and filtering options for items
-- Integration with payment gateways
-- Support for media uploads (e.g., item images)
-- Enhanced user interface and experience
-- Analytics and reporting tools
+1. Create feature branch
+2. Make changes (pre-commit hook runs clippy + format)
+3. Push and create PR
+4. CI tests must pass before merging
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-Feel free to explore the structured project components and their interactions to deepen your understanding of Rust and web development. Enjoy building and improving Re-Vibe!
+MIT

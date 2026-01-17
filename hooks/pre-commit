@@ -1,0 +1,25 @@
+#!/bin/bash
+# Pre-commit hook to format code and run clippy before allowing commits
+# This ensures code quality and formatting standards are met before committing
+
+set -e
+
+echo "✨ Formatting code with rustfmt..."
+
+# Format all code
+cargo fmt --all
+
+echo "✅ Code formatted!"
+echo ""
+echo "🔍 Running clippy linter..."
+
+# Run clippy with warnings as errors
+if ! cargo clippy --all-targets --all-features -- -D warnings; then
+    echo ""
+    echo "❌ Clippy found issues. Please fix them before committing."
+    echo "   Run: cargo clippy --all-targets --all-features -- -D warnings"
+    exit 1
+fi
+
+echo "✅ Clippy passed!"
+exit 0

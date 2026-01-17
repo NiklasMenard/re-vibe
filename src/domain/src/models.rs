@@ -23,15 +23,13 @@ pub struct User {
 
 impl User {
     pub fn hash_with_salt(password: &str, salt: &str) -> String {
-        let decoded_bytes = base64::decode(&salt).unwrap();
+        let decoded_bytes = base64::decode(salt).unwrap();
         let mut salt_array: [u8; 16] = [0; 16];
         salt_array.copy_from_slice(&decoded_bytes);
 
-        let hash = hash_with_salt(password, DEFAULT_COST, salt_array)
+        hash_with_salt(password, DEFAULT_COST, salt_array)
             .unwrap()
-            .to_string();
-
-        hash
+            .to_string()
     }
 }
 
@@ -63,7 +61,7 @@ impl NewUser {
             id: Uuid::new_v4(),
             email: email.to_string(),
             password: hash,
-            salt: base64::encode(&new_salt),
+            salt: base64::encode(new_salt),
         }
     }
 }
