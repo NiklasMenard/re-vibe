@@ -1,0 +1,23 @@
+# Cargo configuration for faster builds and better caching
+
+[build]
+# Use incremental compilation for faster rebuilds
+incremental = true
+
+# Parallel compilation jobs (adjust based on your CPU cores)
+# jobs = 8  # Uncomment and adjust if needed
+
+[profile.dev]
+# Faster linking
+split-debuginfo = "unpacked"
+
+[profile.test]
+# Inherit from dev profile for faster test compilation
+inherits = "dev"
+
+# Optional: reduce optimization for faster compilation during testing
+# opt-level = 0
+
+[net]
+# Faster dependency downloads
+git-fetch-with-cli = false

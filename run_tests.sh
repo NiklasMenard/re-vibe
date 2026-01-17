@@ -52,6 +52,11 @@ echo -e "${YELLOW}🔄 Running database migrations...${NC}"
 DATABASE_URL=postgres://postgres:testpassword@localhost:5434/re_vibe_test diesel migration run
 echo -e "${GREEN}✓ Migrations complete${NC}"
 
+# Build tests first (leverages incremental compilation)
+echo ""
+echo -e "${YELLOW}🔨 Building tests...${NC}"
+cargo build --tests --workspace
+
 # Run tests
 echo ""
 echo -e "${YELLOW}🧪 Running tests...${NC}"
@@ -59,7 +64,7 @@ echo "================================"
 
 # Run tests and capture exit code
 set +e  # Don't exit on test failure
-cargo test --workspace -- --test-threads=1
+cargo test --workspace --no-fail-fast -- --test-threads=1
 TEST_EXIT_CODE=$?
 set -e
 
@@ -79,3 +84,4 @@ else
     echo -e "${RED}❌ Some tests failed${NC}"
     exit $TEST_EXIT_CODE
 fi
+j
