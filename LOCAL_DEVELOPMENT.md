@@ -8,6 +8,46 @@ This guide explains how to run and test the Re-Vibe application locally, outside
 - Docker and Docker Compose (for database)
 - Make (usually pre-installed on macOS/Linux)
 
+## Editor Setup (VS Code)
+
+### Enable Clippy Warnings in Editor
+
+To see clippy warnings directly in VS Code as you code:
+
+1. **Make sure rust-analyzer is installed** (not the old "Rust" extension)
+2. **Add to your VS Code settings** (`Cmd+Shift+P` → "Preferences: Open User Settings (JSON)"):
+
+```json
+{
+  "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.check.extraArgs": [
+    "--all-targets",
+    "--all-features",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "rust-analyzer.checkOnSave": true,
+  "[rust]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  }
+}
+```
+
+3. **Restart rust-analyzer**: `Cmd+Shift+P` → "rust-analyzer: Restart server"
+
+**Benefits:**
+- Red squiggly lines under code with clippy warnings
+- Hover tooltips showing warning messages
+- Quick fixes available via lightbulb icon
+- Auto-format on save with rustfmt
+- Same strict rules as CI (`-D warnings`)
+
+**Troubleshooting:**
+- If warnings don't appear, check Output panel: `View` → `Output` → "Rust Analyzer Language Server"
+- Restart rust-analyzer if needed
+
 ## Quick Start
 
 ### 1. Install Dependencies
