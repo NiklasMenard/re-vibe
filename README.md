@@ -7,6 +7,7 @@ Welcome to Re-Vibe! This project is designed to showcase a demo website for sell
 ## Table of Contents
 
 - [Project Overview](#project-overview)
+- [Quick Reference](#quick-reference)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
@@ -18,15 +19,44 @@ Welcome to Re-Vibe! This project is designed to showcase a demo website for sell
 - [Future Improvements](#future-improvements)
 - [License](#license)
 
+## Quick Reference
+
+**Common Commands (using Makefile):**
+```bash
+make help              # Show all available commands
+make install           # Install all dependencies
+make dev               # Start database and run app locally
+make test              # Run all tests
+make db-reset          # Reset database
+make docker-up         # Start production containers
+```
+
+**Alternative (using scripts directly):**
+```bash
+./run_local.sh         # Start database and run app locally
+./run_tests.sh         # Run all tests with Docker
+./test_ci_local.sh     # Test CI workflows locally with act
+```
+
+**See Also:**
+- [`Makefile`](Makefile) - All available development commands
+- [`LOCAL_DEVELOPMENT.md`](LOCAL_DEVELOPMENT.md) - Comprehensive development guide
+- [`.github/workflows/ci.yml`](.github/workflows/ci.yml) - CI pipeline that runs on every push
+- [`.github/workflows/prod.yml`](.github/workflows/prod.yml) - Production deployment workflow
+
+
 ## Getting Started
 
 ### Prerequisites
 
 Before you begin, ensure that the following prerequisites are installed on your system:
 
-- [Rust](https://www.rust-lang.org/tools/install) (including Cargo)
-- [Diesel CLI](http://diesel.rs/guides/getting-started/) for managing database schema and migrations
-- [PostgreSQL](https://www.postgresql.org/download/) database server
+- [Rust](https://www.rust-lang.org/tools/install) (version 1.88.0, automatically managed via `rust-toolchain.toml`)
+- [Docker](https://www.docker.com/get-started) and Docker Compose
+- [Make](https://www.gnu.org/software/make/) (usually pre-installed on macOS/Linux)
+
+**Optional:**
+- [act](https://github.com/nektos/act) for testing CI workflows locally
 
 ### Installation
 
@@ -42,50 +72,81 @@ Before you begin, ensure that the following prerequisites are installed on your 
    cd re-vibe
    ```
 
-3. Install project dependencies using Cargo:
+3. Install all dependencies (Rust toolchain, diesel CLI, etc.):
 
    ```bash
-   cargo build
+   make install
    ```
+
+   This will:
+   - Verify Rust installation
+   - Install diesel CLI (if not already installed)
+   - Verify Docker installation
+   - Check for `.env` file
 
 4. Create a `.env` file in the project root directory and configure the database connection settings, keys, and secrets. You can use the following template:
 
    ```env
-   # Database connection URL. Replace 'username' and 'password' with your PostgreSQL credentials.
-   DATABASE_URL=postgres://username:password@localhost/re-vibe
+   # Database connection URL (for local development with Docker)
+   DATABASE_URL=postgres://postgres:yourpassword@localhost:5433/postgres
 
-   # PostgreSQL password for the user specified in DATABASE_URL.
-   POSTGRES_PASSWORD=postgrespw
+   # PostgreSQL password
+   POSTGRES_PASSWORD=yourpassword
 
-   # Secret key used to sign and verify JSON Web Tokens (JWT). Should be a strong, secret string.
-   JWT_SECRET=jwtsecret
+   # Secret key used to sign and verify JSON Web Tokens (JWT)
+   JWT_SECRET=your-secret-key-here
 
-   # Storage Bucket Access Key for authenticating API requests to Storage Bucket services.
-   BUCKET_SECRET_ACCESS_KEY=key
-
-   # Storage Bucket Secret Access Key for authenticating API requests to Storage Bucket services.
-   BUCKET_SECRET_ACCESS_KEY=key
+   # AWS S3 / DigitalOcean Spaces credentials
+   BUCKET_ACCESS_KEY=your-access-key
+   BUCKET_SECRET_ACCESS_KEY=your-secret-key
+   BUCKET_ENDPOINT_URL=https://your-endpoint-url
    ```
 
-   Replace `username` and `password` with your PostgreSQL credentials.
+   Replace the placeholder values with your actual credentials.
 
-5. Create a `.env.development` file in the project `src/UI` directory to create a local Vite API URL reference for your server API. You can use the following template:
+5. Create a `.env.development` file in the project `src/UI` directory for Vite frontend configuration:
 
    ```env
-   # Base URL for API requests. Replace with your server's URL and port.
+   # Base URL for API requests
    VITE_API_BASE_URL=http://localhost:8000
    ```
 
-6. Set up the database schema and run initial migrations using Diesel:
+6. Start the database and run migrations:
 
    ```bash
-   diesel setup
-   diesel migration run
+   make db-up      # Start PostgreSQL in Docker
+   make migrate    # Run database migrations
+   ```
+
+   Or use the all-in-one development command:
+
+   ```bash
+   make dev        # Starts database, runs migrations, and starts the app
    ```
 
 ### Database Management
 
-If you need to reset the database (drop all tables and re-run migrations), follow these steps:
+**Reset the database (drop all tables and re-run migrations):**
+
+```bash
+make db-reset
+```
+
+This will:
+1. Stop and remove the database container
+2. Start a fresh database container
+3. Run all migrations
+
+**Other database commands:**
+
+```bash
+make db-up       # Start database
+make db-down     # Stop database
+make migrate     # Run migrations
+make seed        # Seed database with sample data
+```
+
+**Manual database management (if needed):**
 
 1. Drop the existing database:
 
@@ -93,53 +154,71 @@ If you need to reset the database (drop all tables and re-run migrations), follo
    diesel database reset
    ```
 
-   This will drop and recreate the database.
-
 2. Re-run migrations:
 
    ```bash
-   diesel migration run
+   make migrate
    ```
 
-3. (Optional) Seed the database with product data and bucket keys that reference images in the Digital Ocean bucket:
+3. (Optional) Seed the database with sample data:
 
    ```bash
-   cargo run --bin seeder
+   make seed
    ```
 
 ## Usage
 
-To launch the Re-Vibe server, execute the following command in the project directory:
+To launch the Re-Vibe server:
 
+**Using Makefile (recommended):**
+```bash
+make dev
+```
+
+This will:
+- Start the PostgreSQL database in Docker
+- Run database migrations
+- Start the application on port 8000
+
+**Using cargo directly:**
 ```bash
 cargo run --bin main
 ```
 
-The server will start and listen on the specified port. You can interact with the website and its API using your web browser or an API client.
+The server will start and listen on port 8000. You can access the website at `http://localhost:8000`.
 
 ## Testing
 
 The project includes comprehensive unit and integration tests for all crates. Tests use a separate PostgreSQL test database managed via Docker Compose.
 
-### Quick Start - Automated Test Runner
+### Quick Start
 
-The easiest way to run all tests is using the provided test runner script:
+**Run all tests (recommended):**
+```bash
+make test
+```
 
+**Run tests in watch mode (auto-rerun on file changes):**
+```bash
+make test-watch
+```
+
+**Using the script directly:**
 ```bash
 ./run_tests.sh
 ```
 
-This script automatically:
+The test runner automatically:
 1. Creates `.env.test` if it doesn't exist
 2. Starts the test database with Docker Compose
 3. Waits for the database to be ready
 4. Runs database migrations
-5. Executes all tests
+5. Builds and executes all tests (with caching for faster subsequent runs)
 6. Cleans up (stops database and removes volumes)
 
 ### Manual Test Setup
 
-If you prefer to run tests manually:
+If you prefer to run tests manually or need more control:
 
 1. **Create test environment file:**
 
