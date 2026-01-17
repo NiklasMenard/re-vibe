@@ -36,7 +36,7 @@ pub async fn list_favorite_products(pool: &DbPool, user_id: Uuid) -> Result<Stri
         .load::<Product>(&mut connect)
         .await
         .map_err(|err| {
-            eprintln!("Database error - {}", err);
+            eprintln!("Database error - {err}");
             Status::InternalServerError
         })?;
 

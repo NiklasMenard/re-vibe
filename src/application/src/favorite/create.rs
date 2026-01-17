@@ -29,7 +29,7 @@ pub async fn favorite_product(pool: &DbPool, user_id: Uuid, product_id: i32) -> 
             Ok(serde_json::to_string(&response).unwrap())
         }
         Err(err) => {
-            eprintln!("Database error - {}", err);
+            eprintln!("Database error - {err}");
             Err(Status::InternalServerError)
         }
     }

@@ -24,14 +24,13 @@ pub async fn get_by_id(pool: &DbPool, id: Uuid) -> Result<User, NotFound<String>
             diesel::result::Error::NotFound => {
                 let response = Response {
                     body: ResponseBody::Message(format!(
-                        "Error selecting user with id {} - {}",
-                        id, err
+                        "Error selecting user with id {id} - {err}"
                     )),
                 };
-                return Err(NotFound(serde_json::to_string(&response).unwrap()));
+                Err(NotFound(serde_json::to_string(&response).unwrap()))
             }
             _ => {
-                panic!("Database error - {}", err);
+                panic!("Database error - {err}");
             }
         },
     }

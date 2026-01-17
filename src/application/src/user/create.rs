@@ -42,10 +42,10 @@ pub async fn register_user(pool: &DbPool, credentials: Json<Credentials>) -> Sta
                 diesel::result::DatabaseErrorKind::UniqueViolation,
                 _info,
             ) => {
-                return Status::Conflict;
+                Status::Conflict
             }
             _ => {
-                panic!("Database error - {}", err);
+                panic!("Database error - {err}");
             }
         },
     }

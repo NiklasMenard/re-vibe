@@ -34,7 +34,7 @@ pub async fn update_product(pool: &DbPool, id: i32, new_product: Json<NewProduct
         Err(err) => match err {
             diesel::result::Error::NotFound => Err(Status::NotFound),
             _ => {
-                eprintln!("Database error - {}", err);
+                eprintln!("Database error - {err}");
                 Err(Status::InternalServerError)
             }
         },

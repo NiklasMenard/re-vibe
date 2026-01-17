@@ -37,7 +37,7 @@ pub async fn post_product(pool: &DbPool, product: Json<NewProduct>) -> Result<St
             Ok(serde_json::to_string(&response).unwrap())
         }
         Err(err) => {
-            eprintln!("Database error - {}", err);
+            eprintln!("Database error - {err}");
             Err(Status::InternalServerError)
         }
     }

@@ -25,7 +25,7 @@ pub struct ApiKey {
 
 impl ApiKey {
     fn from_claims(claims: &BTreeMap<String, String>) -> Option<Self> {
-        let role_str = claims.get("role").and_then(|role| Some(role.as_str()));
+        let role_str = claims.get("role").map(|role| role.as_str());
 
         let role = match role_str {
             Some("1") => UserRole::User,
@@ -136,13 +136,12 @@ pub fn read_token(incoming: &str) -> Result<ApiKey, TokenReadError> {
     }
 
     if header.algorithm == AlgorithmType::Hs384 {
-        let new_api_key = match ApiKey::from_claims(&claims) {
+        match ApiKey::from_claims(claims) {
             Some(api_key) => Ok(api_key),
             None => Err(TokenReadError::ParsingFailure(
                 "Invalid or missing claims".to_string(),
             )),
-        };
-        new_api_key
+        }
     } else {
         Err(TokenReadError::ParsingFailure(
             "Error with algorithm type".to_string(),
@@ -150,8 +149,8 @@ pub fn read_token(incoming: &str) -> Result<ApiKey, TokenReadError> {
     }
 }
 
-async fn extract_token_from_request<'r>(
-    request: &'r Request<'_>,
+async fn extract_token_from_request(
+    request: &Request<'_>,
 ) -> Outcome<ApiKey, (Status, NetworkResponse), Status> {
     let keys: Vec<_> = request.headers().get("Authorization").collect();
 

@@ -21,7 +21,7 @@ pub async fn unfavorite_product(pool: &DbPool, id: i32) -> Result<String, Status
                 return Err(Status::NotFound);
             }
             _ => {
-                eprintln!("Database error - {}", err);
+                eprintln!("Database error - {err}");
                 return Err(Status::InternalServerError);
             }
         },
@@ -47,8 +47,8 @@ pub async fn unfavorite_product(pool: &DbPool, id: i32) -> Result<String, Status
                 }
             }
             Err(err) => {
-                eprintln!("Database error - {}", err);
-                return Err(Status::InternalServerError);
+                eprintln!("Database error - {err}");
+                Err(Status::InternalServerError)
             }
         }
     } else {

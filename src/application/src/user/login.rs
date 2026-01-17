@@ -30,9 +30,9 @@ pub async fn check_email_password(pool: &DbPool, email: String, password: String
                     role_id: role.role_id,
                 };
 
-                return Some(new_user_role);
+                Some(new_user_role)
             } else {
-                return None;
+                None
             }
         }
 

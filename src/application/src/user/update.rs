@@ -37,14 +37,13 @@ pub async fn update_user(pool: &DbPool, user_id: String, user: Json<User>) -> Re
             diesel::result::Error::NotFound => {
                 let response = Response {
                     body: ResponseBody::Message(format!(
-                        "Error updating user with id {:?} - {:?}",
-                        id, err
+                        "Error updating user with id {id:?} - {err:?}"
                     )),
                 };
-                return Err(NotFound(serde_json::to_string(&response).unwrap()));
+                Err(NotFound(serde_json::to_string(&response).unwrap()))
             }
             _ => {
-                panic!("Database error - {}", err);
+                panic!("Database error - {err}");
             }
         },
     }

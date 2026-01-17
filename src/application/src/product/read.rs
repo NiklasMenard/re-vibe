@@ -22,13 +22,13 @@ pub async fn list_products(
     let mut query = products::table.select(products::all_columns).into_boxed();
 
     if let Some(filter_name) = name {
-        query = query.filter(products::name.like(format!("%{}%", filter_name)));
+        query = query.filter(products::name.like(format!("%{filter_name}%")));
     }
 
     let total_count: i64 = match products::table.select(count_star()).first(&mut connect).await {
         Ok(result) => result,
         Err(err) => {
-            eprintln!("Database error - {}", err);
+            eprintln!("Database error - {err}");
             return Err(Status::InternalServerError);
         }
     };
@@ -45,7 +45,7 @@ pub async fn list_products(
         .load::<Product>(&mut connect)
         .await
         .map_err(|err| {
-            eprintln!("Database error - {}", err);
+            eprintln!("Database error - {err}");
             Status::InternalServerError
         })?;
 
@@ -82,7 +82,7 @@ pub async fn list_products(
                 products_with_urls.push(product);
             }
             Err(err) => {
-                eprintln!("S3 error - {}", err);
+                eprintln!("S3 error - {err}");
                 return Err(Status::InternalServerError);
             }
         }
@@ -140,7 +140,7 @@ pub async fn list_product(pool: &DbPool, product_id: i32) -> Result<String, Stat
                     Ok(serde_json::to_string(&response).unwrap())
                 }
                 Err(err) => {
-                    eprintln!("S3 error - {}", err);
+                    eprintln!("S3 error - {err}");
                     Err(Status::InternalServerError)
                 }
             }
@@ -148,7 +148,7 @@ pub async fn list_product(pool: &DbPool, product_id: i32) -> Result<String, Stat
         Err(err) => match err {
             diesel::result::Error::NotFound => Err(Status::NotFound),
             _ => {
-                eprintln!("Database error - {}", err);
+                eprintln!("Database error - {err}");
                 Err(Status::InternalServerError)
             }
         },

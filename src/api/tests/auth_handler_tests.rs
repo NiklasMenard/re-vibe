@@ -63,7 +63,7 @@ async fn test_login_handler_success() {
     let response = client
         .post("/api/auth/login")
         .header(ContentType::JSON)
-        .body(format!(r#"{{"email": "{}", "password": "{}"}}"#, test_email, test_password))
+        .body(format!(r#"{{"email": "{test_email}", "password": "{test_password}"}}"#))
         .dispatch()
         .await;
 
@@ -87,7 +87,7 @@ async fn test_login_handler_invalid_credentials() {
     let response = client
         .post("/api/auth/login")
         .header(ContentType::JSON)
-        .body(format!(r#"{{"email": "{}", "password": "wrongpassword"}}"#, test_email))
+        .body(format!(r#"{{"email": "{test_email}", "password": "wrongpassword"}}"#))
         .dispatch()
         .await;
 
@@ -122,7 +122,7 @@ async fn test_create_user_success() {
     let response = client
         .post("/api/users/register")
         .header(ContentType::JSON)
-        .body(format!(r#"{{"email": "{}", "password": "newpassword123"}}"#, test_email))
+        .body(format!(r#"{{"email": "{test_email}", "password": "newpassword123"}}"#))
         .dispatch()
         .await;
 
@@ -150,7 +150,7 @@ async fn test_create_duplicate_user() {
     let response = client
         .post("/api/users/register")
         .header(ContentType::JSON)
-        .body(format!(r#"{{"email": "{}", "password": "{}"}}"#, test_email, test_password))
+        .body(format!(r#"{{"email": "{test_email}", "password": "{test_password}"}}"#))
         .dispatch()
         .await;
 
