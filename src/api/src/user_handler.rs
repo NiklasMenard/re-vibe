@@ -15,8 +15,14 @@ use uuid::Uuid;
 use application::user::{create, delete, read, update};
 
 #[get("/<id>")]
-pub async fn list_user_handler(pool: &State<DbPool>, _key: AdminApiKey, id: String) -> Result<String, Status> {
-    let user = read::get_by_id(pool.inner(), Uuid::parse_str(&id).unwrap()).await.map_err(|_| Status::NotFound)?;
+pub async fn list_user_handler(
+    pool: &State<DbPool>,
+    _key: AdminApiKey,
+    id: String,
+) -> Result<String, Status> {
+    let user = read::get_by_id(pool.inner(), Uuid::parse_str(&id).unwrap())
+        .await
+        .map_err(|_| Status::NotFound)?;
 
     let response = Response {
         body: ResponseBody::User(user),
@@ -31,7 +37,9 @@ pub async fn update_user_handler(
     id: String,
     user: Json<User>,
 ) -> Result<String, Status> {
-    let user = update::update_user(pool.inner(), id, user).await.map_err(|_| Status::NotFound)?;
+    let user = update::update_user(pool.inner(), id, user)
+        .await
+        .map_err(|_| Status::NotFound)?;
 
     let response = Response {
         body: ResponseBody::User(user),
@@ -42,7 +50,9 @@ pub async fn update_user_handler(
 
 #[delete("/<id>")]
 pub async fn delete_user_handler(pool: &State<DbPool>, _key: AdminApiKey, id: String) -> Status {
-    delete::delete_user(pool.inner(), Uuid::parse_str(&id).unwrap()).await.ok();
+    delete::delete_user(pool.inner(), Uuid::parse_str(&id).unwrap())
+        .await
+        .ok();
     Status::NoContent
 }
 

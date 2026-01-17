@@ -24,9 +24,7 @@ pub async fn post_product(pool: &DbPool, product: Json<NewProduct>) -> Result<St
     };
 
     match diesel::insert_into(products::table)
-        .values((
-            &new_product_data,
-        ))
+        .values((&new_product_data,))
         .get_result::<Product>(&mut connection)
         .await
     {

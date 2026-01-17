@@ -25,13 +25,13 @@ pub async fn delete_product(pool: &DbPool, id: i32) -> Result<String, Status> {
     };
 
     if num_deleted > 0 {
-        match products::table
-            .load::<Product>(&mut connect)
-            .await
-        {
+        match products::table.load::<Product>(&mut connect).await {
             Ok(products_) => {
                 let response = Response {
-                    body: ResponseBody::Message(format!("Successfully deleted product. {} products remaining.", products_.len())),
+                    body: ResponseBody::Message(format!(
+                        "Successfully deleted product. {} products remaining.",
+                        products_.len()
+                    )),
                 };
                 Ok(serde_json::to_string(&response).unwrap())
             }

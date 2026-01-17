@@ -6,7 +6,11 @@ use domain::{
 };
 use infrastructure::database::connection::DbPool;
 
-pub async fn check_email_password(pool: &DbPool, email: String, password: String) -> Option<UserRole> {
+pub async fn check_email_password(
+    pool: &DbPool,
+    email: String,
+    password: String,
+) -> Option<UserRole> {
     let mut connection = pool.get().await.ok()?;
 
     // Use manual join conditions to get user info and associated role

@@ -1,4 +1,3 @@
-
 use diesel::QueryDsl;
 use diesel_async::RunQueryDsl;
 use domain::schema::users;
@@ -18,7 +17,10 @@ pub async fn delete_user(pool: &DbPool, id: Uuid) -> Result<(), NotFound<String>
         }
     };
 
-    match diesel::delete(users::table.find(id)).execute(&mut connection).await {
+    match diesel::delete(users::table.find(id))
+        .execute(&mut connection)
+        .await
+    {
         Ok(_) => Ok(()),
         Err(err) => match err {
             diesel::result::Error::NotFound => {

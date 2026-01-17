@@ -1,15 +1,15 @@
+use bigdecimal::{BigDecimal, FromPrimitive};
+use chrono::Utc;
+use diesel::prelude::*;
+use diesel::RunQueryDsl;
+use domain::models::NewProduct;
+use dotenvy::dotenv;
+use rand::Rng;
 use std::env;
 use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
-use bigdecimal::{BigDecimal, FromPrimitive};
-use diesel::RunQueryDsl;
-use diesel::prelude::*;
-use domain::models::NewProduct;
-use dotenvy::dotenv;
-use rand::Rng;
 use uuid::Uuid;
-use chrono::Utc;
 
 fn read_products_from_csv(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let file = File::open(path)?;
@@ -51,25 +51,30 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let prices = [19.99, 29.99, 39.99, 49.99, 59.99];
 
-    let seller_ids = ["58346d65-40e1-4d88-b938-13588c0caa15",
+    let seller_ids = [
+        "58346d65-40e1-4d88-b938-13588c0caa15",
         "5cf522b0-ac95-4526-a0c3-3163d38115f0",
         "ef7903d1-ec4b-4264-bcbd-f46524d601d6",
         "8d71442b-99f0-4557-af99-7d3e78aa1ea5",
-        "7af689f1-3f74-4586-a56c-29b913815f0b"];
+        "7af689f1-3f74-4586-a56c-29b913815f0b",
+    ];
 
     let mut rng = rand::thread_rng();
 
-    let new_products: Vec<NewProduct> = bucket_keys.into_iter().map(|bucket_key| NewProduct {
-        name: names[rng.gen_range(0..names.len())].to_string(),
-        description: descriptions[rng.gen_range(0..descriptions.len())].to_string(),
-        price: BigDecimal::from_f64(prices[rng.gen_range(0..prices.len())])
-            .expect("Failed to convert f64 to BigDecimal"),
-        quantity: rng.gen_range(1..20),
-        seller_id: Uuid::parse_str(seller_ids[rng.gen_range(0..seller_ids.len())]).unwrap(),
-        category_id: categories[rng.gen_range(0..categories.len())],
-        creation_date: Utc::now().naive_utc(),
-        bucket_key,
-    }).collect();
+    let new_products: Vec<NewProduct> = bucket_keys
+        .into_iter()
+        .map(|bucket_key| NewProduct {
+            name: names[rng.gen_range(0..names.len())].to_string(),
+            description: descriptions[rng.gen_range(0..descriptions.len())].to_string(),
+            price: BigDecimal::from_f64(prices[rng.gen_range(0..prices.len())])
+                .expect("Failed to convert f64 to BigDecimal"),
+            quantity: rng.gen_range(1..20),
+            seller_id: Uuid::parse_str(seller_ids[rng.gen_range(0..seller_ids.len())]).unwrap(),
+            category_id: categories[rng.gen_range(0..categories.len())],
+            creation_date: Utc::now().naive_utc(),
+            bucket_key,
+        })
+        .collect();
 
     diesel::insert_into(products::table)
         .values(&new_products)

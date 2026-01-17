@@ -63,15 +63,27 @@ async fn test_login_handler_success() {
     let response = client
         .post("/api/auth/login")
         .header(ContentType::JSON)
-        .body(format!(r#"{{"email": "{test_email}", "password": "{test_password}"}}"#))
+        .body(format!(
+            r#"{{"email": "{test_email}", "password": "{test_password}"}}"#
+        ))
         .dispatch()
         .await;
 
-    assert_eq!(response.status(), Status::Ok, "Login should succeed with valid credentials");
+    assert_eq!(
+        response.status(),
+        Status::Ok,
+        "Login should succeed with valid credentials"
+    );
 
     let body = response.into_string().await.unwrap();
-    assert!(body.contains("access_token"), "Response should contain access token");
-    assert!(body.contains("\"success\":true"), "Response should indicate success");
+    assert!(
+        body.contains("access_token"),
+        "Response should contain access token"
+    );
+    assert!(
+        body.contains("\"success\":true"),
+        "Response should indicate success"
+    );
 
     // Cleanup
     cleanup_test_user(test_email).await;
@@ -87,11 +99,17 @@ async fn test_login_handler_invalid_credentials() {
     let response = client
         .post("/api/auth/login")
         .header(ContentType::JSON)
-        .body(format!(r#"{{"email": "{test_email}", "password": "wrongpassword"}}"#))
+        .body(format!(
+            r#"{{"email": "{test_email}", "password": "wrongpassword"}}"#
+        ))
         .dispatch()
         .await;
 
-    assert_eq!(response.status(), Status::Unauthorized, "Login should fail with invalid credentials");
+    assert_eq!(
+        response.status(),
+        Status::Unauthorized,
+        "Login should fail with invalid credentials"
+    );
 }
 
 #[tokio::test]
@@ -106,7 +124,11 @@ async fn test_login_handler_malformed_json() {
         .dispatch()
         .await;
 
-    assert_ne!(response.status(), Status::Ok, "Malformed JSON should not succeed");
+    assert_ne!(
+        response.status(),
+        Status::Ok,
+        "Malformed JSON should not succeed"
+    );
 }
 
 #[tokio::test]
@@ -122,11 +144,17 @@ async fn test_create_user_success() {
     let response = client
         .post("/api/users/register")
         .header(ContentType::JSON)
-        .body(format!(r#"{{"email": "{test_email}", "password": "newpassword123"}}"#))
+        .body(format!(
+            r#"{{"email": "{test_email}", "password": "newpassword123"}}"#
+        ))
         .dispatch()
         .await;
 
-    assert_eq!(response.status(), Status::Accepted, "User creation should succeed");
+    assert_eq!(
+        response.status(),
+        Status::Accepted,
+        "User creation should succeed"
+    );
 
     // Cleanup
     cleanup_test_user(test_email).await;
@@ -150,11 +178,17 @@ async fn test_create_duplicate_user() {
     let response = client
         .post("/api/users/register")
         .header(ContentType::JSON)
-        .body(format!(r#"{{"email": "{test_email}", "password": "{test_password}"}}"#))
+        .body(format!(
+            r#"{{"email": "{test_email}", "password": "{test_password}"}}"#
+        ))
         .dispatch()
         .await;
 
-    assert_eq!(response.status(), Status::Conflict, "Duplicate user creation should return Conflict");
+    assert_eq!(
+        response.status(),
+        Status::Conflict,
+        "Duplicate user creation should return Conflict"
+    );
 
     // Cleanup
     cleanup_test_user(test_email).await;
@@ -165,10 +199,7 @@ async fn test_create_duplicate_user() {
 async fn test_logout_clears_cookie() {
     let client = common::setup_test_client().await;
 
-    let response = client
-        .post("/api/auth/logout")
-        .dispatch()
-        .await;
+    let response = client.post("/api/auth/logout").dispatch().await;
 
     assert_eq!(response.status(), Status::Ok, "Logout should succeed");
 

@@ -25,7 +25,11 @@ pub async fn list_products(
         query = query.filter(products::name.like(format!("%{filter_name}%")));
     }
 
-    let total_count: i64 = match products::table.select(count_star()).first(&mut connect).await {
+    let total_count: i64 = match products::table
+        .select(count_star())
+        .first(&mut connect)
+        .await
+    {
         Ok(result) => result,
         Err(err) => {
             eprintln!("Database error - {err}");
@@ -105,7 +109,11 @@ pub async fn list_products(
 pub async fn list_product(pool: &DbPool, product_id: i32) -> Result<String, Status> {
     let mut connect = pool.get().await.map_err(|_| Status::InternalServerError)?;
 
-    let product = match products::table.find(product_id).first::<Product>(&mut connect).await {
+    let product = match products::table
+        .find(product_id)
+        .first::<Product>(&mut connect)
+        .await
+    {
         Ok(product) => {
             let client = create_client().await.unwrap();
 

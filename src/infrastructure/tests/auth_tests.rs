@@ -82,7 +82,8 @@ fn test_jwt_token_with_expiration() {
 
     let verified_token = verified.unwrap();
     let verified_claims = verified_token.claims();
-    let exp = verified_claims.get("exp")
+    let exp = verified_claims
+        .get("exp")
         .and_then(|e| e.parse::<i64>().ok())
         .unwrap();
 
@@ -115,7 +116,8 @@ fn test_expired_token_detection() {
 
     let verified_token = verified.unwrap();
     let verified_claims = verified_token.claims();
-    let exp = verified_claims.get("exp")
+    let exp = verified_claims
+        .get("exp")
         .and_then(|e| e.parse::<i64>().ok())
         .unwrap();
 
@@ -138,5 +140,8 @@ fn test_token_with_invalid_signature() {
     let verified: Result<Token<Header, BTreeMap<String, String>, _>, _> =
         signed_token.as_str().verify_with_key(&key2);
 
-    assert!(verified.is_err(), "Token should fail verification with wrong key");
+    assert!(
+        verified.is_err(),
+        "Token should fail verification with wrong key"
+    );
 }

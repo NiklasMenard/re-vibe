@@ -32,10 +32,12 @@ impl Fairing for CORS {
 
     async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
         // Define allowed origins
-        let allowed_origins = ["http://localhost:3000",
+        let allowed_origins = [
+            "http://localhost:3000",
             "http://localhost:8000",
             "http://127.0.0.1:3000",
-            "http://127.0.0.1:8000"];
+            "http://127.0.0.1:8000",
+        ];
 
         if let Some(origin) = request.headers().get_one("Origin") {
             if allowed_origins.contains(&origin) {

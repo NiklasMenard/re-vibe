@@ -5,7 +5,11 @@ use infrastructure::database::connection::DbPool;
 use rocket::{http::Status, serde::json::Json};
 use shared::response_models::{Response, ResponseBody};
 
-pub async fn update_product(pool: &DbPool, id: i32, new_product: Json<NewProduct>) -> Result<String, Status> {
+pub async fn update_product(
+    pool: &DbPool,
+    id: i32,
+    new_product: Json<NewProduct>,
+) -> Result<String, Status> {
     use domain::schema::products::dsl::*;
 
     let product_update = new_product.into_inner();

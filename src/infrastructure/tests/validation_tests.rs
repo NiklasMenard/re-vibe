@@ -1,6 +1,6 @@
-use infrastructure::validation::{Validi32, ValidUuid};
-use rocket::request::FromParam;
+use infrastructure::validation::{ValidUuid, Validi32};
 use rocket::http::Status;
+use rocket::request::FromParam;
 use uuid::Uuid;
 
 #[test]
@@ -63,8 +63,8 @@ fn test_i32_overflow_parsing() {
 
 #[test]
 fn test_verify_user_id_matching() {
+    use infrastructure::auth::{ApiKey, UserApiKey, UserRole};
     use infrastructure::validation::verify_user_id;
-    use infrastructure::auth::{UserApiKey, ApiKey, UserRole};
 
     let uuid = Uuid::parse_str("550e8400-e29b-41d4-a716-446655440000").unwrap();
     let api_key = UserApiKey(ApiKey {
@@ -76,13 +76,16 @@ fn test_verify_user_id_matching() {
 
     let result = verify_user_id(&api_key, &valid_uuid);
 
-    assert!(result.is_ok(), "Matching user IDs should verify successfully");
+    assert!(
+        result.is_ok(),
+        "Matching user IDs should verify successfully"
+    );
 }
 
 #[test]
 fn test_verify_user_id_mismatch() {
+    use infrastructure::auth::{ApiKey, UserApiKey, UserRole};
     use infrastructure::validation::verify_user_id;
-    use infrastructure::auth::{UserApiKey, ApiKey, UserRole};
 
     let uuid1 = Uuid::parse_str("550e8400-e29b-41d4-a716-446655440000").unwrap();
     let uuid2 = Uuid::parse_str("660e8400-e29b-41d4-a716-446655440001").unwrap();

@@ -53,7 +53,11 @@ async fn test_register_duplicate_user_returns_conflict() {
 
     // Second registration should fail with conflict
     let result2 = register_user(&pool, credentials2).await;
-    assert_eq!(result2, Status::Conflict, "Duplicate email should return Conflict");
+    assert_eq!(
+        result2,
+        Status::Conflict,
+        "Duplicate email should return Conflict"
+    );
 
     // Cleanup
     common::cleanup_test_user(&pool, test_email).await;
@@ -73,9 +77,13 @@ async fn test_check_email_password_valid_credentials() {
     common::create_test_user(&pool, test_email, test_password).await;
 
     // Test login with correct credentials
-    let result = check_email_password(&pool, test_email.to_string(), test_password.to_string()).await;
+    let result =
+        check_email_password(&pool, test_email.to_string(), test_password.to_string()).await;
 
-    assert!(result.is_some(), "Valid credentials should return user role");
+    assert!(
+        result.is_some(),
+        "Valid credentials should return user role"
+    );
 
     let user_role = result.unwrap();
     assert_eq!(user_role.role_id, 1, "Default role should be 1");
@@ -95,7 +103,8 @@ async fn test_check_email_password_invalid_password() {
     common::create_test_user(&pool, test_email, test_password).await;
 
     // Test login with wrong password
-    let result = check_email_password(&pool, test_email.to_string(), "wrongpassword".to_string()).await;
+    let result =
+        check_email_password(&pool, test_email.to_string(), "wrongpassword".to_string()).await;
 
     assert!(result.is_none(), "Invalid password should return None");
 
@@ -111,8 +120,9 @@ async fn test_check_email_password_nonexistent_user() {
     let result = check_email_password(
         &pool,
         "nonexistent@test.com".to_string(),
-        "anypassword".to_string()
-    ).await;
+        "anypassword".to_string(),
+    )
+    .await;
 
     assert!(result.is_none(), "Non-existent user should return None");
 }

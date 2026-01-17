@@ -21,7 +21,10 @@ fn test_password_hashing_is_deterministic() {
     let hash1 = User::hash_with_salt(password, salt);
     let hash2 = User::hash_with_salt(password, salt);
 
-    assert_eq!(hash1, hash2, "Same password and salt should produce same hash");
+    assert_eq!(
+        hash1, hash2,
+        "Same password and salt should produce same hash"
+    );
 }
 
 #[test]
@@ -31,7 +34,10 @@ fn test_different_passwords_produce_different_hashes() {
     let hash1 = User::hash_with_salt("password1", salt);
     let hash2 = User::hash_with_salt("password2", salt);
 
-    assert_ne!(hash1, hash2, "Different passwords should produce different hashes");
+    assert_ne!(
+        hash1, hash2,
+        "Different passwords should produce different hashes"
+    );
 }
 
 #[test]
@@ -40,7 +46,10 @@ fn test_empty_password_hashing() {
 
     let hash = User::hash_with_salt("", salt);
 
-    assert!(!hash.is_empty(), "Empty password should still produce a hash");
+    assert!(
+        !hash.is_empty(),
+        "Empty password should still produce a hash"
+    );
 }
 
 #[test]
@@ -60,5 +69,8 @@ fn test_special_characters_in_password() {
 
     let hash = User::hash_with_salt(special_password, salt);
 
-    assert!(!hash.is_empty(), "Password with special characters should hash successfully");
+    assert!(
+        !hash.is_empty(),
+        "Password with special characters should hash successfully"
+    );
 }

@@ -10,8 +10,9 @@ pub async fn setup_test_pool() -> DbPool {
     // Load .env.test explicitly for tests
     dotenvy::from_filename(".env.test").ok();
 
-    let database_url = env::var("DATABASE_URL")
-        .unwrap_or_else(|_| "postgres://postgres:testpassword@localhost:5434/re_vibe_test".to_string());
+    let database_url = env::var("DATABASE_URL").unwrap_or_else(|_| {
+        "postgres://postgres:testpassword@localhost:5434/re_vibe_test".to_string()
+    });
 
     let config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(database_url);
     Pool::builder(config)
@@ -27,14 +28,18 @@ pub async fn setup_test_client() -> Client {
 
     let rocket = rocket::build()
         .manage(pool)
-        .mount("/api/auth", rocket::routes![
-            auth_handler::login_handler,
-            auth_handler::refresh_token_handler,
-            auth_handler::logout,
-        ])
-        .mount("/api/users", rocket::routes![
-            user_handler::register_user_handler,
-        ]);
+        .mount(
+            "/api/auth",
+            rocket::routes![
+                auth_handler::login_handler,
+                auth_handler::refresh_token_handler,
+                auth_handler::logout,
+            ],
+        )
+        .mount(
+            "/api/users",
+            rocket::routes![user_handler::register_user_handler,],
+        );
 
     Client::tracked(rocket)
         .await

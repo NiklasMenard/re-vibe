@@ -6,7 +6,11 @@ use rocket::http::Status;
 use shared::response_models::{Response, ResponseBody};
 use uuid::Uuid;
 
-pub async fn favorite_product(pool: &DbPool, user_id: Uuid, product_id: i32) -> Result<String, Status> {
+pub async fn favorite_product(
+    pool: &DbPool,
+    user_id: Uuid,
+    product_id: i32,
+) -> Result<String, Status> {
     use domain::schema::user_favorite_products;
 
     let mut connection = pool.get().await.map_err(|_| Status::InternalServerError)?;

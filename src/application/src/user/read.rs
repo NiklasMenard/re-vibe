@@ -1,4 +1,3 @@
-
 use diesel::QueryDsl;
 use diesel_async::RunQueryDsl;
 use domain::{models::User, schema::users};

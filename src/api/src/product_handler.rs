@@ -7,10 +7,7 @@ use rocket::http::Status;
 use rocket::serde::json::Json;
 use rocket::{delete, get, post, put, State};
 
-#[get(
-    "/products?<page>&<page_size>&<name>",
-    format = "application/json"
-)]
+#[get("/products?<page>&<page_size>&<name>", format = "application/json")]
 pub async fn list_products_handler(
     pool: &State<DbPool>,
     page: Option<i64>,
@@ -49,6 +46,10 @@ pub async fn create_product_handler(
 }
 
 #[delete("/products/<id>")]
-pub async fn delete_product_handler(pool: &State<DbPool>, _key: UserApiKey, id: i32) -> Result<String, Status> {
+pub async fn delete_product_handler(
+    pool: &State<DbPool>,
+    _key: UserApiKey,
+    id: i32,
+) -> Result<String, Status> {
     delete::delete_product(pool.inner(), id).await
 }

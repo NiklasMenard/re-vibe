@@ -10,8 +10,9 @@ pub async fn setup_test_pool() -> DbPool {
     // Load .env.test explicitly for tests
     dotenvy::from_filename(".env.test").ok();
 
-    let database_url = env::var("DATABASE_URL")
-        .unwrap_or_else(|_| "postgres://postgres:testpassword@localhost:5434/re_vibe_test".to_string());
+    let database_url = env::var("DATABASE_URL").unwrap_or_else(|_| {
+        "postgres://postgres:testpassword@localhost:5434/re_vibe_test".to_string()
+    });
 
     let config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(database_url);
     Pool::builder(config)
@@ -21,7 +22,7 @@ pub async fn setup_test_pool() -> DbPool {
 
 /// Clean up test user by email
 pub async fn cleanup_test_user(pool: &DbPool, email: &str) {
-    use domain::schema::{users, user_roles};
+    use domain::schema::{user_roles, users};
 
     let mut conn = pool.get().await.unwrap();
 

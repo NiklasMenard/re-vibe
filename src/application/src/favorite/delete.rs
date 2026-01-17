@@ -29,7 +29,10 @@ pub async fn unfavorite_product(pool: &DbPool, id: i32) -> Result<String, Status
 
     // If product deletion was successful (at least one row deleted)
     if num_deleted > 0 {
-        match user_favorite_products::table.load::<UserFavoriteProduct>(&mut connect).await {
+        match user_favorite_products::table
+            .load::<UserFavoriteProduct>(&mut connect)
+            .await
+        {
             Ok(products) => {
                 if !products.is_empty() {
                     let response = Response {

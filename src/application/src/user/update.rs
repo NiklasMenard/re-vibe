@@ -6,7 +6,11 @@ use rocket::{response::status::NotFound, serde::json::Json};
 use shared::response_models::{Response, ResponseBody};
 use uuid::Uuid;
 
-pub async fn update_user(pool: &DbPool, user_id: String, user: Json<User>) -> Result<User, NotFound<String>> {
+pub async fn update_user(
+    pool: &DbPool,
+    user_id: String,
+    user: Json<User>,
+) -> Result<User, NotFound<String>> {
     use domain::schema::users::dsl::*;
 
     let post_to_update = user.into_inner();
