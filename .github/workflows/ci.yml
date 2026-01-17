@@ -26,7 +26,7 @@ jobs:
         ports:
           - 5434:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -80,6 +80,11 @@ jobs:
       - name: Run tests
         env:
           DATABASE_URL: postgres://postgres:testpassword@localhost:5434/re_vibe_test
+          POSTGRES_PASSWORD: testpassword
+          JWT_SECRET: test_jwt_secret_for_ci
+          BUCKET_ACCESS_KEY: test_access_key
+          BUCKET_SECRET_ACCESS_KEY: test_secret_key
+          BUCKET_ENDPOINT_URL: https://mock-s3-endpoint.com
         run: |
           cargo test --workspace -- --test-threads=1
 
