@@ -38,14 +38,20 @@ To see clippy warnings directly in VS Code as you code:
 3. **Restart rust-analyzer**: `Cmd+Shift+P` → "rust-analyzer: Restart server"
 
 **Benefits:**
-- Red squiggly lines under code with clippy warnings
-- Hover tooltips showing warning messages
-- Quick fixes available via lightbulb icon
-- Auto-format on save with rustfmt
-- Same strict rules as CI (`-D warnings`)
+- 🔴 Red squiggly lines under code with clippy warnings
+- 💡 Hover tooltips showing warning messages
+- 🔧 Quick fixes available via lightbulb icon
+- ✨ **Auto-format on save with rustfmt** (key setting: `"editor.formatOnSave": true`)
+- 🎯 Same strict rules as CI (`-D warnings`)
+
+**How Format-on-Save Works:**
+- Every time you save a `.rs` file (`Cmd+S`), rustfmt automatically formats it
+- No need to run `cargo fmt` manually
+- Your code is always properly formatted
 
 **Troubleshooting:**
 - If warnings don't appear, check Output panel: `View` → `Output` → "Rust Analyzer Language Server"
+- If formatting doesn't work, make sure `"editor.formatOnSave": true` is set
 - Restart rust-analyzer if needed
 
 ## Quick Start
